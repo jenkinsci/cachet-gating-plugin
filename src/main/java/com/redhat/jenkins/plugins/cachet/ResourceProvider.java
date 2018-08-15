@@ -38,12 +38,6 @@ public enum ResourceProvider {
             try {
                 Map<String, Resource> results = new HashMap<>();
                 for (String name : names) {
-                    try {
-                        Resource x = new Resource(name);
-                        x.setStatusId(ResourceStatus.UNKNOWN);
-                    } catch (Exception e) {
-                        log.log(Level.SEVERE, "Exception!", e);
-                    }
                     Resource r = new Resource(name, ResourceStatus.UNKNOWN, "Unknown");
                     if (resources.containsKey(name)) {
                         JsonNode node = resources.get(name);

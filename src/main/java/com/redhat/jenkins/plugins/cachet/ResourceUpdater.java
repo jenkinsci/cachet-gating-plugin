@@ -43,40 +43,50 @@ public class ResourceUpdater extends PeriodicWork {
 
     @Override
     protected void doRun() throws Exception {
+        if (!StringUtils.isEmpty(GlobalCachetConfiguration.get().getCachetUrl())) {
+            setResources();
+        }
+    }
+
+    public static void setResources() {
         String api = GlobalCachetConfiguration.get().getCachetUrl();
         log.info("Refreshing resources from " + api);
 
-        Map<String, JsonNode> rmap = null;
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            rmap = new TreeMap<>();
-            String link = StringUtils.appendIfMissing(GlobalCachetConfiguration.get().getCachetUrl(), "/") + LIST_COMPONENTS + "?" + PER_PAGE;
-            while (link != null  && !link.equals("null")) {
-                HttpGet get = new HttpGet(link);
-                try (CloseableHttpResponse response = httpClient.execute(get)) {
-                    if (response != null && response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                        ObjectMapper om = new ObjectMapper();
-                        JsonNode root = om.readTree(response.getEntity().getContent());
-                        ArrayNode resources = (ArrayNode) root.get(ATTRIBUTE_DATA);
-                        if (resources != null && resources.size() > 0) {
-                            Iterator<JsonNode> i = resources.iterator();
-                            while (i.hasNext()) {
-                                JsonNode n = i.next();
-                                rmap.put(n.get(ATTRIBUTE_NAME).asText(), n);
+        if (!StringUtils.isEmpty(api)) {
+            Map<String, JsonNode> rmap = null;
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                rmap = new TreeMap<>();
+                String link = StringUtils.appendIfMissing(api, "/") + LIST_COMPONENTS + "?" + PER_PAGE;
+                while (link != null  && !link.equals("null")) {
+                    HttpGet get = new HttpGet(link);
+                    try (CloseableHttpResponse response = httpClient.execute(get)) {
+                        if (response != null && response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                            ObjectMapper om = new ObjectMapper();
+                            JsonNode root = om.readTree(response.getEntity().getContent());
+                            ArrayNode resources = (ArrayNode) root.get(ATTRIBUTE_DATA);
+                            if (resources != null && resources.size() > 0) {
+                                Iterator<JsonNode> i = resources.iterator();
+                                while (i.hasNext()) {
+                                    JsonNode n = i.next();
+                                    rmap.put(n.get(ATTRIBUTE_NAME).asText(), n);
+                                }
                             }
+                            link = root.get(ATTRIBUTE_META).get(ATTRIBUTE_PAGINATION).get(ATTRIBUTE_LINKS).get(ATTRIBUTE_NEXT_PAGE).asText();
+                        } else {
+                            log.severe("Failed to retrieve Cachet component list - " + response.getStatusLine().getStatusCode() + ".");
+                            link = null;
                         }
-                        link = root.get(ATTRIBUTE_META).get(ATTRIBUTE_PAGINATION).get(ATTRIBUTE_LINKS).get(ATTRIBUTE_NEXT_PAGE).asText();
-                    } else {
-                        log.severe("Failed to retrieve Cachet component list - " + response.getStatusLine().getStatusCode() + ".");
-                        link = null;
                     }
                 }
+            } catch (Exception e) {
+                log.log(Level.SEVERE, "Unhandled exception retrieving Cachet component list.", e);
+                rmap = null;
+            } finally {
+                ResourceProvider.SINGLETON.setResources(rmap);
+                log.info("Resources: " + rmap.keySet().toString());
             }
-        } catch (Exception e) {
-            log.log(Level.SEVERE, "Unhandled exception retrieving Cachet component list.", e);
-            rmap = null;
-        } finally {
-            ResourceProvider.SINGLETON.setResources(rmap);
-            log.info("Resources: " + rmap.keySet().toString());
+        } else {
+            log.warning("No Cachet URL set.");
         }
     }
 }
