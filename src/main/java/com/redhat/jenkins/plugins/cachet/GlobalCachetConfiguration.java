@@ -47,7 +47,6 @@ public final class GlobalCachetConfiguration extends GlobalConfiguration {
 
     private String cachetUrl;
 
-    @DataBoundConstructor
     public GlobalCachetConfiguration() {
         load();
     }

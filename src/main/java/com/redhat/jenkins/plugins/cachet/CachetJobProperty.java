@@ -50,7 +50,6 @@ public class CachetJobProperty extends JobProperty<Job<?, ?>> {
         return requiredResources;
     }
 
-    @DataBoundSetter
     public void setRequiredResources(Boolean requiredResources) {
         this.requiredResources = requiredResources;
     }
@@ -59,7 +58,6 @@ public class CachetJobProperty extends JobProperty<Job<?, ?>> {
         return resources;
     }
 
-    @DataBoundSetter
     public void setResources(List<String> resources) {
         this.resources = resources;
     }
