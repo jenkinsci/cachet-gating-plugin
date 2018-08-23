@@ -13,6 +13,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 import org.apache.http.HttpStatus;
+import org.jenkinsci.test.acceptance.junit.AbstractJUnitTest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,7 +47,7 @@ import com.redhat.jenkins.plugins.cachet.ResourceUpdater;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class CachetGatingPluginTest {
+public class CachetGatingPluginTest extends AbstractJUnitTest {
     private static final int SERVICE_PORT = 32000;
     private static final int SC_NOT_AUTHORIZED = 401;
 
@@ -61,6 +62,7 @@ public class CachetGatingPluginTest {
     @Before
     public void setup() {
         wireMock = new WireMock(SERVICE_PORT);
+        GlobalCachetConfiguration.get().setCachetUrl(TEST_CACHE_URL);
     }
     /**
      * Utility method for reading files.
@@ -107,7 +109,6 @@ public class CachetGatingPluginTest {
 
     @Test
     public void testMe() {
-        GlobalCachetConfiguration.get().setCachetUrl(TEST_CACHE_URL);
         stubFor(get(urlMatching(TEST_CACHE_CONTEXT + ".+"))
                 .willReturn(error("resources.txt", HttpStatus.SC_OK)));
         ResourceUpdater.setResources();

@@ -54,37 +54,12 @@
   </pluginRepositories>
 
   <properties>
+    <jenkins.version>2.60.3</jenkins.version>
+    <maven.javadoc.skip>true</maven.javadoc.skip>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jenkins-structs.version>1.10</jenkins-structs.version>
-    <jenkins-basic-steps.version>2.6</jenkins-basic-steps.version>
-    <jenkins-credentials.version>2.1.14</jenkins-credentials.version>
-    <jenkins-plaincredentials.version>1.4</jenkins-plaincredentials.version>
-    <jenkins-durable-task.version>1.14</jenkins-durable-task.version>
-    <jenkins-durable-task-step.version>2.14</jenkins-durable-task-step.version>
-    <jenkins-workflow-cps.version>2.39</jenkins-workflow-cps.version>
-    <jenkins-workflow-job.version>2.11.2</jenkins-workflow-job.version>
-    <jenkins-workflow-step-api.version>2.12</jenkins-workflow-step-api.version>
-    <jenkins-workflow-support.version>2.14</jenkins-workflow-support.version>
-    <jenkins-workflow-api.version>2.20</jenkins-workflow-api.version>
-    <jenkins-workflow-scm-step.version>2.5</jenkins-workflow-scm-step.version>
-    <jenkins-scm-api.version>2.2.1</jenkins-scm-api.version>
-    <jenkins-script-security.version>1.33</jenkins-script-security.version>
-    <jenkins-credentials-binding.version>1.13</jenkins-credentials-binding.version>
-    <jacoco.version>0.7.5.201505241946</jacoco.version>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>4.5.6</version>
-    </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
@@ -100,77 +75,97 @@
       <artifactId>commons-lang3</artifactId>
       <version>3.7</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+      <version>4.4.10</version>
+    </dependency>
+    <dependency>
+        <groupId>org.jenkins-ci</groupId>
+        <artifactId>symbol-annotation</artifactId>
+        <version>1.14</version>
+    </dependency>
     
     <!-- for testing -->
-<!--
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-job</artifactId>
-      <version>${jenkins-workflow-job.version}</version>
+      <version>2.24</version>
       <scope>test</scope>
+      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-basic-steps</artifactId>
-      <version>${jenkins-basic-steps.version}</version>
+      <version>2.9</version>
       <scope>test</scope>
+      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-step-api</artifactId>
-      <version>${jenkins-workflow-step-api.version}</version>
-      <classifier>tests</classifier>
+      <version>2.16</version>
       <scope>test</scope>
+      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-support</artifactId>
-      <version>${jenkins-workflow-support.version}</version>
-      <classifier>tests</classifier>
+      <version>2.20</version>
       <scope>test</scope>
+      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-scm-step</artifactId>
-      <version>${jenkins-workflow-scm-step.version}</version>
+      <version>2.6</version>
       <scope>test</scope>
+      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>scm-api</artifactId>
-      <version>${jenkins-scm-api.version}</version>
+      <version>2.2.7</version>
       <scope>test</scope>
+      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-api</artifactId>
-      <version>${jenkins-workflow-api.version}</version>
+      <version>2.29</version>
       <scope>test</scope>
+      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>credentials</artifactId>
-      <version>${jenkins-credentials.version}</version>
+      <version>2.1.18</version>
       <scope>test</scope>
+      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>plain-credentials</artifactId>
-      <version>${jenkins-plaincredentials.version}</version>
+      <version>1.4</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>credentials-binding</artifactId>
-      <version>${jenkins-credentials-binding.version}</version>
+      <version>1.16</version>
       <scope>test</scope>
-    </dependency>
--->
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>junit</artifactId>
-      <version>1.6</version>
-      <scope>test</scope>
+      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
@@ -191,9 +186,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-      <version>4.4.10</version>
+        <groupId>org.jenkins-ci</groupId>
+        <artifactId>acceptance-test-harness</artifactId>
+        <version>1.61</version>
+        <scope>test</scope>
     </dependency>
   </dependencies>
 
