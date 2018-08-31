@@ -13,7 +13,6 @@ import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
-import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -79,9 +78,9 @@ public final class GlobalCachetConfiguration extends GlobalConfiguration {
             if (registered != null) {
                 PluginManager pm = Jenkins.getInstance().pluginManager;
                 PluginWrapper source = pm.whichPlugin(registered.getClass());
-                throw new AssertionError("Version mismatch: GlobalCIConfiguration provided by other plugin: " + source);
+                throw new AssertionError("Version mismatch: GlobalCachetConfiguration provided by other plugin: " + source);
             }
-            throw new AssertionError("GlobalCIConfiguration is not registered: " + all);
+            throw new AssertionError("GlobalCachetConfiguration is not registered: " + all);
         }
         return c;
     }

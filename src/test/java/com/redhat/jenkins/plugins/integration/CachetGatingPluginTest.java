@@ -1,4 +1,4 @@
-package com.redhat.jenkins.plugin.cachet;
+package com.redhat.jenkins.plugins.integration;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -14,6 +14,7 @@ import java.nio.charset.Charset;
 
 import org.apache.http.HttpStatus;
 import org.jenkinsci.test.acceptance.junit.AbstractJUnitTest;
+import org.jenkinsci.test.acceptance.junit.WithPlugins;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,8 +22,8 @@ import org.junit.Test;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.redhat.jenkins.plugins.cachet.GlobalCachetConfiguration;
 import com.redhat.jenkins.plugins.cachet.ResourceUpdater;
+import com.redhat.jenkins.plugins.integration.po.GlobalCachetConfiguration;
 
 /*
  * The MIT License
@@ -47,6 +48,7 @@ import com.redhat.jenkins.plugins.cachet.ResourceUpdater;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+@WithPlugins({"cachet-gating-plugin"})
 public class CachetGatingPluginTest extends AbstractJUnitTest {
     private static final int SERVICE_PORT = 32000;
     private static final int SC_NOT_AUTHORIZED = 401;
@@ -62,7 +64,9 @@ public class CachetGatingPluginTest extends AbstractJUnitTest {
     @Before
     public void setup() {
         wireMock = new WireMock(SERVICE_PORT);
-        GlobalCachetConfiguration.get().setCachetUrl(TEST_CACHE_URL);
+        jenkins.configure();
+        GlobalCachetConfiguration pluginConfig = new GlobalCachetConfiguration(jenkins.getConfigPage());
+        pluginConfig.url(TEST_CACHE_URL);
     }
     /**
      * Utility method for reading files.
