@@ -65,23 +65,15 @@ public final class GlobalCachetConfiguration extends GlobalConfiguration {
     }
 
     @Override
-    public boolean configure(StaplerRequest req, JSONObject json) throws hudson.model.Descriptor.FormException {
+    public boolean configure(StaplerRequest req, JSONObject json) {
         req.bindJSON(this, json);
         save();
         return true;
     }
+
     public static @Nonnull GlobalCachetConfiguration get() {
-        ExtensionList<GlobalConfiguration> all = GlobalConfiguration.all();
-        GlobalCachetConfiguration c = all.get(GlobalCachetConfiguration.class);
-        if (c == null) {
-            GlobalConfiguration registered = all.getDynamic(GlobalCachetConfiguration.class.getCanonicalName());
-            if (registered != null) {
-                PluginManager pm = Jenkins.getInstance().pluginManager;
-                PluginWrapper source = pm.whichPlugin(registered.getClass());
-                throw new AssertionError("Version mismatch: GlobalCachetConfiguration provided by other plugin: " + source);
-            }
-            throw new AssertionError("GlobalCachetConfiguration is not registered: " + all);
-        }
-        return c;
+        ExtensionList<GlobalCachetConfiguration> extensions = ExtensionList.lookup(GlobalCachetConfiguration.class);
+        assert extensions.size() == 1: "One cachet configuration expected, got " + extensions.size();
+        return extensions.get(0);
     }
 }

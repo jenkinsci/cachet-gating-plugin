@@ -1,30 +1,3 @@
-package com.redhat.jenkins.plugins.integration;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import hudson.Util;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.Charset;
-
-import org.apache.http.HttpStatus;
-import org.jenkinsci.test.acceptance.junit.AbstractJUnitTest;
-import org.jenkinsci.test.acceptance.junit.WithPlugins;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
-import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.redhat.jenkins.plugins.cachet.ResourceUpdater;
-import com.redhat.jenkins.plugins.integration.po.GlobalCachetConfiguration;
-
 /*
  * The MIT License
  *
@@ -48,13 +21,42 @@ import com.redhat.jenkins.plugins.integration.po.GlobalCachetConfiguration;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@WithPlugins({"cachet-gating-plugin"})
-public class CachetGatingPluginTest extends AbstractJUnitTest {
+package com.redhat.jenkins.plugins.integration;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+
+import com.redhat.jenkins.plugins.cachet.GlobalCachetConfiguration;
+import hudson.Util;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.Charset;
+
+import org.apache.http.HttpStatus;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.redhat.jenkins.plugins.cachet.ResourceUpdater;
+import org.jvnet.hudson.test.JenkinsRule;
+
+public class CachetGatingPluginTest {
     private static final int SERVICE_PORT = 32000;
     private static final int SC_NOT_AUTHORIZED = 401;
 
     private static final String TEST_CACHE_CONTEXT = "cachet";
     private static final String TEST_CACHE_URL = "http://localhost:" + SERVICE_PORT + "/" + TEST_CACHE_CONTEXT;
+
+    @Rule
+    public final JenkinsRule j = new JenkinsRule();
 
     @Rule
     public final WireMockRule wireMockRule = new WireMockRule(SERVICE_PORT);
@@ -64,25 +66,23 @@ public class CachetGatingPluginTest extends AbstractJUnitTest {
     @Before
     public void setup() {
         wireMock = new WireMock(SERVICE_PORT);
-        jenkins.configure();
-        GlobalCachetConfiguration pluginConfig = new GlobalCachetConfiguration(jenkins.getConfigPage());
-        pluginConfig.url(TEST_CACHE_URL);
+        GlobalCachetConfiguration gcc = GlobalCachetConfiguration.get();
+        gcc.setCachetUrl(TEST_CACHE_URL);
     }
+
     /**
      * Utility method for reading files.
      * @param path path to file.
      * @return contents of file.
      */
-    public static String readFile(String path) {
+    private static String readFile(String path) {
         try {
             URL res = CachetGatingPluginTest.class.getResource(path);
             return Util.loadFile(
                     new File(res.toURI()),
                     Charset.forName("UTF-8")
             );
-        } catch (IOException e) {
-            throw new Error(e);
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             throw new Error(e);
         }
     }
@@ -113,7 +113,7 @@ public class CachetGatingPluginTest extends AbstractJUnitTest {
 
     @Test
     public void testMe() {
-        stubFor(get(urlMatching(TEST_CACHE_CONTEXT + ".+"))
+        stubFor(get(urlMatching("/" + TEST_CACHE_CONTEXT + ".+"))
                 .willReturn(error("resources.txt", HttpStatus.SC_OK)));
         ResourceUpdater.setResources();
     }
