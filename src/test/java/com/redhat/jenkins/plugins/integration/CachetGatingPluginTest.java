@@ -27,8 +27,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-
-import com.redhat.jenkins.plugins.cachet.GlobalCachetConfiguration;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import hudson.Util;
 
 import java.io.File;
@@ -36,21 +36,27 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.redhat.jenkins.plugins.cachet.GlobalCachetConfiguration;
+import com.redhat.jenkins.plugins.cachet.Resource;
+import com.redhat.jenkins.plugins.cachet.ResourceProvider;
+import com.redhat.jenkins.plugins.cachet.ResourceStatus;
 import com.redhat.jenkins.plugins.cachet.ResourceUpdater;
-import org.jvnet.hudson.test.JenkinsRule;
 
 public class CachetGatingPluginTest {
     private static final int SERVICE_PORT = 32000;
-    private static final int SC_NOT_AUTHORIZED = 401;
 
     private static final String TEST_CACHE_CONTEXT = "cachet";
     private static final String TEST_CACHE_URL = "http://localhost:" + SERVICE_PORT + "/" + TEST_CACHE_CONTEXT;
@@ -61,6 +67,7 @@ public class CachetGatingPluginTest {
     @Rule
     public final WireMockRule wireMockRule = new WireMockRule(SERVICE_PORT);
 
+    @SuppressWarnings("unused")
     private WireMock wireMock;
 
     @Before
@@ -68,6 +75,9 @@ public class CachetGatingPluginTest {
         wireMock = new WireMock(SERVICE_PORT);
         GlobalCachetConfiguration gcc = GlobalCachetConfiguration.get();
         gcc.setCachetUrl(TEST_CACHE_URL);
+
+        stubFor(get(urlMatching("/" + TEST_CACHE_CONTEXT + ".+")).willReturn(ok("resources.txt")));
+        ResourceUpdater.setResources();
     }
 
     /**
@@ -95,27 +105,55 @@ public class CachetGatingPluginTest {
                 .withBody(body);
     }
 
-    private ResponseDefinitionBuilder notfound() {
-        return aResponse().withStatus(HttpStatus.SC_NOT_FOUND);
-    }
-
-    private ResponseDefinitionBuilder notauthorized() {
-        return aResponse().withStatus(SC_NOT_AUTHORIZED).withBody("Not Authorized");
-    }
-
-    private ResponseDefinitionBuilder error(String path, int statusCode, String... args) {
-        String body = String.format(readFile(path), (Object[])args);
-        return aResponse()
-                .withStatus(statusCode)
-                .withHeader("Content-Type", "text/json")
-                .withBody(body);
+    @Test
+    public void testGetResourceNames() {
+        List<String> names = ResourceProvider.SINGLETON.getResourceNames();
+        assertEquals(names.size(), 11);
+        assertEquals(names.toString(), "[brew, ci-rhos, covscan, dummy, errata, gerrit.host.prod.eng.bos.redhat.com, polarion, rdo-cloud, rpmdiff, umb, zabbix-sysops]");
     }
 
     @Test
-    public void testMe() {
-        stubFor(get(urlMatching("/" + TEST_CACHE_CONTEXT + ".+"))
-                .willReturn(error("resources.txt", HttpStatus.SC_OK)));
-        ResourceUpdater.setResources();
+    public void testResourceUp() {
+        Resource r = ResourceProvider.SINGLETON.getResource("brew");
+        assertNotNull(r);
+        assertEquals(r.getName(), "brew");
+        assertEquals(r.getStatusId(), ResourceStatus.OPERATIONAL);
+    }
+
+    @Test
+    public void testResourceDown() {
+        Resource r = ResourceProvider.SINGLETON.getResource("rdo-cloud");
+        assertNotNull(r);
+        assertEquals(r.getName(), "rdo-cloud");
+        assertEquals(r.getStatusId(), ResourceStatus.MAJOR_OUTAGE);
+    }
+
+    @Test
+    public void testGetResources() {
+        Map<String, Resource> resources = ResourceProvider.SINGLETON.getResources(Arrays.asList("brew", "rdo-cloud"));
+        assertNotNull(resources);
+        assertEquals(resources.keySet().size(), 2);
+        assertNotNull(resources.get("brew"));
+        assertNotNull(resources.get("rdo-cloud"));
+    }
+
+    @Test
+    public void testGetUnknownResource() {
+        Map<String, Resource> resources = ResourceProvider.SINGLETON.getResources(Arrays.asList("garbage"));
+        assertNotNull(resources);
+        assertEquals(resources.keySet().size(), 1);
+        Resource garbage = resources.get("garbage");
+        assertNotNull(garbage);
+        assertEquals(garbage.getStatusId(), ResourceStatus.UNKNOWN);
+    }
+
+    @Test
+    public void testGetSomeResources() {
+        Map<String, Resource> resources = ResourceProvider.SINGLETON.getResources(Arrays.asList("brew", "garbage"));
+        assertNotNull(resources);
+        assertEquals(resources.keySet().size(), 2);
+        assertNotNull(resources.get("brew"));
+        assertNotNull(resources.get("garbage"));
     }
 
 //    @Test(expected = MBSException.class)

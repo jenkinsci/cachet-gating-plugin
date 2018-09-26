@@ -2,15 +2,10 @@ package com.redhat.jenkins.plugins.cachet;
 
 import hudson.Extension;
 import hudson.ExtensionList;
-import hudson.PluginManager;
-import hudson.PluginWrapper;
-
-import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
 import jenkins.model.GlobalConfiguration;
-import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
 import org.kohsuke.stapler.DataBoundSetter;
@@ -42,7 +37,6 @@ import org.kohsuke.stapler.StaplerRequest;
 
 @Extension
 public final class GlobalCachetConfiguration extends GlobalConfiguration {
-    private static final Logger log = Logger.getLogger(GlobalCachetConfiguration.class.getName());
 
     private String cachetUrl;
 
@@ -61,7 +55,7 @@ public final class GlobalCachetConfiguration extends GlobalConfiguration {
 
     @Override
     public String getDisplayName() {
-        return Messages.PluginName();
+        return Messages.pluginName();
     }
 
     @Override

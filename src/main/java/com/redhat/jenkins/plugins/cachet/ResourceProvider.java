@@ -1,6 +1,7 @@
 package com.redhat.jenkins.plugins.cachet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,7 @@ public enum ResourceProvider {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private Map<String, JsonNode> resources;
 
-    public void setResources(Map<String, JsonNode> resources) {
+    void setResources(Map<String, JsonNode> resources) {
         lock.writeLock().lock();;
         try {
             this.resources = resources;
@@ -30,6 +31,14 @@ public enum ResourceProvider {
         } finally {
             lock.writeLock().unlock();
         }
+    }
+
+    public Resource getResource(String name) {
+        Map<String, Resource> resources = getResources(Arrays.asList(name));
+        if (resources != null) {
+            return resources.get(name);
+        }
+        return null;
     }
 
     public Map<String, Resource> getResources(List<String> names) {

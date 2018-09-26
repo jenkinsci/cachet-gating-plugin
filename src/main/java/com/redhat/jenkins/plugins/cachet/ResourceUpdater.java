@@ -3,6 +3,7 @@ package com.redhat.jenkins.plugins.cachet;
 import hudson.Extension;
 import hudson.model.PeriodicWork;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -60,30 +61,35 @@ public class ResourceUpdater extends PeriodicWork {
                 while (link != null  && !link.equals("null")) {
                     HttpGet get = new HttpGet(link);
                     try (CloseableHttpResponse response = httpClient.execute(get)) {
-                        if (response != null && response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                            ObjectMapper om = new ObjectMapper();
-                            JsonNode root = om.readTree(response.getEntity().getContent());
-                            ArrayNode resources = (ArrayNode) root.get(ATTRIBUTE_DATA);
-                            if (resources != null && resources.size() > 0) {
-                                Iterator<JsonNode> i = resources.iterator();
-                                while (i.hasNext()) {
-                                    JsonNode n = i.next();
-                                    rmap.put(n.get(ATTRIBUTE_NAME).asText(), n);
+                        if (response != null) {
+                            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                                ObjectMapper om = new ObjectMapper();
+                                JsonNode root = om.readTree(response.getEntity().getContent());
+                                ArrayNode resources = (ArrayNode) root.get(ATTRIBUTE_DATA);
+                                if (resources != null && resources.size() > 0) {
+                                    Iterator<JsonNode> i = resources.iterator();
+                                    while (i.hasNext()) {
+                                        JsonNode n = i.next();
+                                        rmap.put(n.get(ATTRIBUTE_NAME).asText(), n);
+                                    }
                                 }
+                                link = root.get(ATTRIBUTE_META).get(ATTRIBUTE_PAGINATION).get(ATTRIBUTE_LINKS).get(ATTRIBUTE_NEXT_PAGE).asText();
+                            } else {
+                                log.severe("Failed to retrieve Cachet component list - " + response.getStatusLine().getStatusCode() + ".");
+                                link = null;
                             }
-                            link = root.get(ATTRIBUTE_META).get(ATTRIBUTE_PAGINATION).get(ATTRIBUTE_LINKS).get(ATTRIBUTE_NEXT_PAGE).asText();
                         } else {
-                            log.severe("Failed to retrieve Cachet component list - " + response.getStatusLine().getStatusCode() + ".");
+                            log.severe("Failed to retrieve Cachet component list, null response returned.");
                             link = null;
                         }
                     }
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 log.log(Level.SEVERE, "Unhandled exception retrieving Cachet component list.", e);
                 rmap = null;
             } finally {
                 ResourceProvider.SINGLETON.setResources(rmap);
-                log.info("Resources: " + rmap.keySet().toString());
+                log.info("Resources: " + (rmap != null ? rmap.keySet().toString() : "<none>"));
             }
         } else {
             log.warning("No Cachet URL set.");

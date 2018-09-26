@@ -1,3 +1,4 @@
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <!--
      * The MIT License
@@ -23,7 +24,6 @@
      * THE SOFTWARE.
      */
   -->
-  <?jelly escape-by-default='true'?>
   <f:section title="${%Cachet Configuration}">
     <f:entry title="Cachet API URL" field="cachetUrl">
       <f:textbox />

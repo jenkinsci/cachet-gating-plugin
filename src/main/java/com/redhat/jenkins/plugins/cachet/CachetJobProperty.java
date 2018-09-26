@@ -6,10 +6,8 @@ import hudson.model.JobPropertyDescriptor;
 import hudson.model.Job;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
 
 /*
  * The MIT License
@@ -35,7 +33,6 @@ import org.kohsuke.stapler.DataBoundSetter;
  * THE SOFTWARE.
  */
 public class CachetJobProperty extends JobProperty<Job<?, ?>> {
-    private static final Logger log = Logger.getLogger(CachetJobProperty.class.getName());
 
     private Boolean requiredResources;
     private List<String> resources;
@@ -67,7 +64,7 @@ public class CachetJobProperty extends JobProperty<Job<?, ?>> {
 
         @Override
         public String getDisplayName() {
-            return Messages.PluginName();
+            return Messages.pluginName();
         }
 
         public List<String> getResourceNames() {

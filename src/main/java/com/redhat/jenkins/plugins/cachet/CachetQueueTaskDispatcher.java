@@ -36,7 +36,7 @@ public class CachetQueueTaskDispatcher extends QueueTaskDispatcher {
                         }
                     }
                     if (msgs.size() > 0) {
-                        return CauseOfBlockage.fromMessage(Messages._BlockedMessage(StringUtils.join(msgs, "; ")));
+                        return CauseOfBlockage.fromMessage(Messages._blockedMessage(StringUtils.join(msgs, "; ")));
                     }
                 }
             }
