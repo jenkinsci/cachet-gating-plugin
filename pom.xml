@@ -9,7 +9,7 @@
     <artifactId>plugin</artifactId>
     <version>2.37</version>
   </parent>
-  
+
   <artifactId>cachet-gating-plugin</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>hpi</packaging>
@@ -97,7 +97,7 @@
         <artifactId>symbol-annotation</artifactId>
         <version>1.14</version>
     </dependency>
-    
+
     <!-- for testing -->
     <dependency>
       <groupId>junit</groupId>
@@ -110,56 +110,48 @@
       <artifactId>workflow-job</artifactId>
       <version>2.24</version>
       <scope>test</scope>
-      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-basic-steps</artifactId>
       <version>2.9</version>
       <scope>test</scope>
-      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-step-api</artifactId>
       <version>2.16</version>
       <scope>test</scope>
-      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-support</artifactId>
       <version>2.20</version>
       <scope>test</scope>
-      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-scm-step</artifactId>
       <version>2.6</version>
       <scope>test</scope>
-      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>scm-api</artifactId>
       <version>2.2.7</version>
       <scope>test</scope>
-      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-api</artifactId>
       <version>2.29</version>
       <scope>test</scope>
-      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>credentials</artifactId>
       <version>2.1.18</version>
       <scope>test</scope>
-      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -172,7 +164,6 @@
       <artifactId>credentials-binding</artifactId>
       <version>1.16</version>
       <scope>test</scope>
-      <type>hpi</type>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
