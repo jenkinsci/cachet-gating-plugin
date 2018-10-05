@@ -4,6 +4,11 @@ import hudson.Extension;
 import hudson.model.PeriodicWork;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,16 +16,30 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.SSLContexts;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
 
 @Extension
 public class ResourceUpdater extends PeriodicWork {
@@ -49,13 +68,49 @@ public class ResourceUpdater extends PeriodicWork {
         }
     }
 
+    private static SSLContext buildAllowAnythingSSLContext() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+            return SSLContexts.custom().loadTrustMaterial(null, new TrustStrategy() {
+                @Override
+                public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                    return true;
+                }
+            }).build();
+    }
+
+    private static CloseableHttpClient createHTTPClient(boolean ignoreSSL)
+            throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
+
+        if (ignoreSSL) {
+            SSLContext sslContext = buildAllowAnythingSSLContext();
+
+            SSLConnectionSocketFactory sslConnectionSocketFactory =
+                    new SSLConnectionSocketFactory(sslContext, null, null,
+                            NoopHostnameVerifier.INSTANCE);
+
+            PoolingHttpClientConnectionManager connectionManager = new
+                    PoolingHttpClientConnectionManager(RegistryBuilder.
+                    <ConnectionSocketFactory>create()
+                    .register("http", PlainConnectionSocketFactory.getSocketFactory())
+                    .register("https", sslConnectionSocketFactory).build());
+
+            // finally create the HttpClient using HttpClient factory methods and assign the ssl socket factory
+            return HttpClients
+                    .custom()
+                    .setConnectionManager(connectionManager)
+                    .build();
+        } else {
+            return HttpClients.createDefault();
+        }
+    }
+
     public static void setResources() {
         String api = GlobalCachetConfiguration.get().getCachetUrl();
+        Boolean ignoreSSL = BooleanUtils.isTrue(GlobalCachetConfiguration.get().getIgnoreSSL());
         log.info("Refreshing resources from " + api);
 
         if (!StringUtils.isEmpty(api)) {
             Map<String, JsonNode> rmap = null;
-            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            try (CloseableHttpClient httpClient = createHTTPClient(ignoreSSL)) {
                 rmap = new TreeMap<>();
                 String link = StringUtils.appendIfMissing(api, "/") + LIST_COMPONENTS + "?" + PER_PAGE;
                 while (link != null  && !link.equals("null")) {
@@ -84,7 +139,7 @@ public class ResourceUpdater extends PeriodicWork {
                         }
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException | NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
                 log.log(Level.SEVERE, "Unhandled exception retrieving Cachet component list.", e);
                 rmap = null;
             } finally {
