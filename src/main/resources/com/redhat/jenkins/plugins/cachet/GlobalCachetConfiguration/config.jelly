@@ -28,6 +28,9 @@
     <f:entry title="Cachet API URL" field="cachetUrl">
       <f:textbox />
     </f:entry>
+    <f:entry title="Ignore SSL?" field="ignoreSSL" description="If checked, ignore SSL issues">
+        <f:checkbox/>
+    </f:entry>
   </f:section>
 </j:jelly>
 

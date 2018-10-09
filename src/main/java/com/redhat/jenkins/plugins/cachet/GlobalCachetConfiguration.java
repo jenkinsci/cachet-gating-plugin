@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import jenkins.model.GlobalConfiguration;
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -39,6 +40,16 @@ import org.kohsuke.stapler.StaplerRequest;
 public final class GlobalCachetConfiguration extends GlobalConfiguration {
 
     private String cachetUrl;
+    private Boolean ignoreSSL;
+
+    public boolean getIgnoreSSL() {
+        return BooleanUtils.toBoolean(ignoreSSL);
+    }
+
+    @DataBoundSetter
+    public void setIgnoreSSL(Boolean ignoreSSL) {
+        this.ignoreSSL = ignoreSSL;
+    }
 
     public GlobalCachetConfiguration() {
         load();
