@@ -10,7 +10,7 @@
     <version>2.37</version>
   </parent>
 
-  <artifactId>cachet-gating-plugin</artifactId>
+  <artifactId>cachet-gating</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>hpi</packaging>
   <name>Cachet Gate Plugin</name>
