@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>cachet-gating</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>hpi</packaging>
   <name>Cachet Gate Plugin</name>
   <description>Plugin to gate jobs based on Cachet resources availability.</description>
