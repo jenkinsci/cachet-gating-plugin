@@ -84,7 +84,7 @@ public class CachetGatingMetrics {
     @Whitelisted
     public Long getGatedTimeElapsed() {
         if (gateUpdatedTime == null || gateStartTime == null) {
-            return new Long(0);
+            return Long.valueOf(0);
         }
         return gateUpdatedTime - gateStartTime;
     }
