@@ -2,6 +2,8 @@ package com.redhat.jenkins.plugins.cachet;
 
 import org.jenkinsci.plugins.scriptsecurity.sandbox.whitelists.Whitelisted;
 
+import java.io.Serializable;
+
 
 /*
  * The MIT License
@@ -28,7 +30,7 @@ import org.jenkinsci.plugins.scriptsecurity.sandbox.whitelists.Whitelisted;
  */
 
 
-public class CachetGatingMetrics {
+public class CachetGatingMetrics implements Serializable {
 
     private String resourceName;
     private Long gateUpdatedTime;
@@ -102,5 +104,6 @@ public class CachetGatingMetrics {
         return gatingStatus;
     }
 
+    private static final long serialVersionUID = 1L;
 
 }
