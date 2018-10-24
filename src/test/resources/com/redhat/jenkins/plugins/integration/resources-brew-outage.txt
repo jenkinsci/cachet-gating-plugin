@@ -1,0 +1,222 @@
+{
+  "meta": {
+    "pagination": {
+      "total": 10,
+      "count": 10,
+      "per_page": 20,
+      "current_page": 1,
+      "total_pages": 1,
+      "links": {
+        "next_page": null,
+        "previous_page": null
+      }
+    }
+  },
+  "data": [
+    {
+      "id": 4,
+      "name": "ci-rhos",
+      "description": "Down if one of ci-rhos sub-systems are down.",
+      "link": "https:\/\/docs.engineering.redhat.com\/display\/KB\/Semaphore+-+CI-RHOS",
+      "status": 1,
+      "order": 0,
+      "group_id": 3,
+      "enabled": true,
+      "created_at": "2018-03-20 14:41:03",
+      "updated_at": "2018-08-12 17:03:29",
+      "deleted_at": null,
+      "status_name": "Operational",
+      "tags": {
+        "ci-rhos": "ci-rhos",
+        "aggregate": "aggregate",
+        "system": "system"
+      }
+    },
+    {
+      "id": 5,
+      "name": "zabbix-sysops",
+      "description": "Down if one of zabbix components is down.",
+      "link": "https:\/\/docs.engineering.redhat.com\/display\/KB\/Semaphore+-+Zabbix",
+      "status": 1,
+      "order": 0,
+      "group_id": 3,
+      "enabled": true,
+      "created_at": "2018-03-20 14:53:18",
+      "updated_at": "2018-03-20 14:53:18",
+      "deleted_at": null,
+      "status_name": "Operational",
+      "tags": {
+        "zabbix": "zabbix",
+        "aggregate": "aggregate",
+        "system": "system"
+      }
+    },
+    {
+      "id": 6,
+      "name": "brew",
+      "description": "Down if all brew subsystems are down.",
+      "link": "https:\/\/docs.engineering.redhat.com\/display\/KB\/Semaphore+-+Brew",
+      "status": 4,
+      "order": 0,
+      "group_id": 3,
+      "enabled": true,
+      "created_at": "2018-03-20 15:25:15",
+      "updated_at": "2018-06-09 02:32:20",
+      "deleted_at": null,
+      "status_name": "Major Outage",
+      "tags": {
+        "brew": "brew",
+        "aggregate": "aggregate",
+        "system": "system"
+      }
+    },
+    {
+      "id": 7,
+      "name": "covscan",
+      "description": "Production covscan service.",
+      "link": "https:\/\/docs.engineering.redhat.com\/display\/KB\/Semaphore+-+Covscan",
+      "status": 1,
+      "order": 0,
+      "group_id": 3,
+      "enabled": true,
+      "created_at": "2018-03-20 15:29:53",
+      "updated_at": "2018-08-13 08:23:37",
+      "deleted_at": null,
+      "status_name": "Operational",
+      "tags": {
+        "covscan": "covscan",
+        "host": "host",
+        "system": "system"
+      }
+    },
+    {
+      "id": 8,
+      "name": "gerrit.host.prod.eng.bos.redhat.com",
+      "description": "",
+      "link": "https:\/\/docs.engineering.redhat.com\/display\/KB\/Semaphore+-+Gerrit",
+      "status": 1,
+      "order": 0,
+      "group_id": 4,
+      "enabled": true,
+      "created_at": "2018-03-20 15:31:35",
+      "updated_at": "2018-03-24 11:48:15",
+      "deleted_at": null,
+      "status_name": "Operational",
+      "tags": {
+        "gerrit": "gerrit",
+        "git": "git"
+      }
+    },
+    {
+      "id": 10,
+      "name": "polarion",
+      "description": "Down if polarion monitor host is signaling outage.",
+      "link": "https:\/\/docs.engineering.redhat.com\/display\/KB\/Semaphore+-+Polarion",
+      "status": 1,
+      "order": 0,
+      "group_id": 3,
+      "enabled": true,
+      "created_at": "2018-03-20 15:32:52",
+      "updated_at": "2018-05-08 18:54:51",
+      "deleted_at": null,
+      "status_name": "Operational",
+      "tags": {
+        "polarion": "polarion",
+        "aggregate": "aggregate",
+        "systame": "systame"
+      }
+    },
+    {
+      "id": 11,
+      "name": "rpmdiff",
+      "description": "Down if one of sub-systems is down.",
+      "link": "https:\/\/docs.engineering.redhat.com\/display\/KB\/Semaphore+-+RPMDiff",
+      "status": 1,
+      "order": 0,
+      "group_id": 3,
+      "enabled": true,
+      "created_at": "2018-03-20 15:34:57",
+      "updated_at": "2018-08-14 11:20:20",
+      "deleted_at": null,
+      "status_name": "Operational",
+      "tags": {
+        "rmpdiff": "rmpdiff",
+        "system": "system"
+      }
+    },
+    {
+      "id": 12,
+      "name": "umb",
+      "description": "Represents whole UMB system. System experiences outage if both brokers are down.",
+      "link": "https:\/\/docs.engineering.redhat.com\/display\/KB\/Semaphore+-+UMB",
+      "status": 1,
+      "order": 0,
+      "group_id": 3,
+      "enabled": true,
+      "created_at": "2018-03-20 15:36:48",
+      "updated_at": "2018-08-15 12:53:42",
+      "deleted_at": null,
+      "status_name": "Operational",
+      "tags": {
+        "umb": "umb",
+        "aggregate": "aggregate",
+        "system": "system"
+      }
+    },
+    {
+      "id": 14,
+      "name": "errata",
+      "description": "Down if errata.devel.redhat.com doesn't return 200.",
+      "link": "https:\/\/docs.engineering.redhat.com\/display\/KB\/Semaphore+-+Errata+Tool",
+      "status": 1,
+      "order": 0,
+      "group_id": 3,
+      "enabled": true,
+      "created_at": "2018-03-21 14:30:53",
+      "updated_at": "2018-03-21 14:30:53",
+      "deleted_at": null,
+      "status_name": "Operational",
+      "tags": {
+        "errata": "errata"
+      }
+    },
+    {
+      "id": 23,
+      "name": "rdo-cloud",
+      "description": "Down if one of rdo cloud sub-systems are down.",
+      "link": "https:\/\/docs.engineering.redhat.com\/display\/KB\/Semaphore+-+RDO+cloud",
+      "status": 4,
+      "order": 0,
+      "group_id": 3,
+      "enabled": true,
+      "created_at": "2018-07-09 13:00:06",
+      "updated_at": "2018-08-13 12:51:13",
+      "deleted_at": null,
+      "status_name": "Major Outage",
+      "tags": {
+        "rdo-cloud": "rdo-cloud",
+        "aggregate": "aggregate",
+        "system": "system"
+      }
+    },
+    {
+      "id": 99,
+      "name": "dummy",
+      "description": "Dummy resource to insure this file is being loaded.",
+      "link": "https:\/\/docs.engineering.redhat.com\/display\/KB\/Semaphore+-+Dummy",
+      "status": 1,
+      "order": 0,
+      "group_id": 3,
+      "enabled": true,
+      "created_at": "2018-07-09 13:00:06",
+      "updated_at": "2018-08-13 12:51:13",
+      "deleted_at": null,
+      "status_name": "Operational",
+      "tags": {
+        "dummy": "dummy",
+        "aggregate": "aggregate",
+        "system": "system"
+      }
+    }
+  ]
+}
