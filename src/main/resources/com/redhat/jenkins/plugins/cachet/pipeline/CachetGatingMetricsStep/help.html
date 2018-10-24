@@ -1,0 +1,15 @@
+<div>
+    <p>This step returns the metrics from a build being gated.</p>
+    <p><pre>
+node() {
+    def metricsMap = cachetgatingmetrics()
+
+    metricsMap.each{ k, v ->
+        echo "resource name: ${k}"
+        echo "status:        ${v.getGatingStatus()}"
+        echo "elapsed time:  ${v.getGatedTimeElapsed()}"
+    }
+
+}
+</pre></p>
+</div>
