@@ -69,10 +69,11 @@ public class CachetGatingWaitForResourcesStep extends Step implements Serializab
                 action = new CachetGatingAction();
             }
             Map<String, CachetGatingMetrics> metrics = ((CachetGatingAction) action).getGatingMetricsMap();
-            Map<String, Long> waitForResourcesMat = new HashMap<String, Long>();
-
-            metrics.forEach((k, v) -> waitForResourcesMat.put(k,v.getGatedTimeElapsed()));
-
+            Map<String, Long> waitForResourcesMat = new HashMap<String, Long>();            
+            
+            for (Map.Entry<String, CachetGatingMetrics> entry : metrics.entrySet()){
+                waitForResourcesMat.put(entry.getKey(),entry.getValue().getGatedTimeElapsed());
+            }
             getContext().onSuccess(waitForResourcesMat);
             return true;
         }
