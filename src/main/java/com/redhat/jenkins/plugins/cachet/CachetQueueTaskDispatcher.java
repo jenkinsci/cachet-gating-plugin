@@ -76,8 +76,8 @@ public class CachetQueueTaskDispatcher extends QueueTaskDispatcher {
                                 msgs.add(message);
                                 log.info(message);
                                 requiredResourcesMetric.setGateUpdatedTime(System.currentTimeMillis());
-                                requiredResourcesMetric.setGatingStatus(r.getStatusName());
                             }
+                            requiredResourcesMetric.setGatingStatus(r.getStatusName());
                         }
                         metricsMap.put(name, requiredResourcesMetric);
                     }
