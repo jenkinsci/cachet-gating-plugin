@@ -284,7 +284,7 @@ public class CachetGatingPluginTest {
         for (String s: log) {
             System.out.println(s);
         }
-        j.assertLogContains("Major Outage", b2);
+        j.assertLogContains("Operational", b2);
     }
 
     protected String loadPipelineScript(String name) {
