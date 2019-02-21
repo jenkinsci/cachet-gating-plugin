@@ -284,7 +284,32 @@ public class CachetGatingPluginTest {
         for (String s: log) {
             System.out.println(s);
         }
-        j.assertLogContains("Major Outage", b2);
+        j.assertLogContains(ResourceStatus.MAJOR_OUTAGE.toString(), b2);
+    }
+
+    @Test
+    public void triggerBuildGatingOperationalStep() throws Exception {
+        WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildGatingOperationalStep");
+        p.addProperty(new CachetJobProperty(true, Arrays.asList("errata")));
+        p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple-with-step.groovy"), true));
+        stubFor(normal);
+        ResourceUpdater.setResources();
+
+        QueueTaskFuture<WorkflowRun> item = p.scheduleBuild2(0);
+        assertNotNull(item);
+
+        WorkflowRun b2 = item.get();
+        j.assertBuildStatusSuccess(j.waitForCompletion(b2));
+        List<String> log = b2.getLog(1000);
+        for (String s: log) {
+            System.out.println(s);
+        }
+        CachetGatingAction bAction2 = b2.getAction(CachetGatingAction.class);
+        Map<String, CachetGatingMetrics> metricsMap2 = bAction2.getGatingMetricsMap();
+        assertNotNull(metricsMap2);
+        CachetGatingMetrics metric2 = metricsMap2.get("errata");
+        assertNotNull(metric2.getGatingStatus());
+        j.assertLogContains(ResourceStatus.OPERATIONAL.toString(), b2);
     }
 
     protected String loadPipelineScript(String name) {

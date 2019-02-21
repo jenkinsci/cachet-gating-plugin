@@ -34,7 +34,7 @@ public class CachetGatingMetrics implements Serializable {
 
     private String resourceName;
     private Long gateUpdatedTime;
-    private String gatingStatus;
+    private ResourceStatus gatingStatus;
     private Long gateStartTime;
 
     @Override
@@ -47,7 +47,7 @@ public class CachetGatingMetrics implements Serializable {
                 '}';
     }
 
-    public CachetGatingMetrics(String resourceName, Long gateStartTime, Long gateUpdatedTime, String status) {
+    public CachetGatingMetrics(String resourceName, Long gateStartTime, Long gateUpdatedTime, ResourceStatus status) {
         this.resourceName = resourceName;
         this.gateStartTime = gateStartTime;
         this.gateUpdatedTime = gateUpdatedTime;
@@ -67,6 +67,7 @@ public class CachetGatingMetrics implements Serializable {
 
     public CachetGatingMetrics(String resourceName) {
         this.resourceName = resourceName;
+        this.gatingStatus = ResourceStatus.OPERATIONAL;
     }
 
     @Whitelisted
@@ -95,12 +96,12 @@ public class CachetGatingMetrics implements Serializable {
         this.gateUpdatedTime = gateUpdatedTime;
     }
 
-    public void setGatingStatus(String status) {
+    public void setGatingStatus(ResourceStatus status) {
         this.gatingStatus = status;
     }
 
     @Whitelisted
-    public String getGatingStatus() {
+    public ResourceStatus getGatingStatus() {
         return gatingStatus;
     }
 
