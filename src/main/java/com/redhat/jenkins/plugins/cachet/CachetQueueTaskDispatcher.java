@@ -68,7 +68,7 @@ public class CachetQueueTaskDispatcher extends QueueTaskDispatcher {
                         if (!watchedResources.containsKey(name)) {
                             msgs.add(String.format("%s: %s", name, "Unknown resource"));
                             requiredResourcesMetric.setGateUpdatedTime(System.currentTimeMillis());
-                            requiredResourcesMetric.setGatingStatus("Unknown resource");
+                            requiredResourcesMetric.setGatingStatus(ResourceStatus.UNKNOWN);
                         } else {
                             Resource r = watchedResources.get(name);
                             if (r.getStatusId() != ResourceStatus.OPERATIONAL) {
@@ -76,7 +76,7 @@ public class CachetQueueTaskDispatcher extends QueueTaskDispatcher {
                                 msgs.add(message);
                                 log.info(message);
                                 requiredResourcesMetric.setGateUpdatedTime(System.currentTimeMillis());
-                                requiredResourcesMetric.setGatingStatus(r.getStatusName());
+                                requiredResourcesMetric.setGatingStatus(r.getStatusId());
                             }
                         }
                         metricsMap.put(name, requiredResourcesMetric);
