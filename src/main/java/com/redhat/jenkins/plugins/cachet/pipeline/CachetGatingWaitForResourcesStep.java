@@ -141,7 +141,7 @@ public class CachetGatingWaitForResourcesStep extends Step implements Serializab
 
         @Override
         public String getFunctionName() {
-            return "cachet-wait-for-resources";
+            return "cachetWaitForResources";
         }
 
         @Override
