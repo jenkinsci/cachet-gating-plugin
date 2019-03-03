@@ -1,8 +1,7 @@
 package com.redhat.jenkins.plugins.cachet.pipeline;
 
 import com.google.common.collect.ImmutableSet;
-import com.redhat.jenkins.plugins.cachet.CachetGatingAction;
-import com.redhat.jenkins.plugins.cachet.CachetGatingMetrics;
+import com.redhat.jenkins.plugins.cachet.*;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.Launcher;
@@ -12,7 +11,7 @@ import hudson.model.TaskListener;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.io.Serializable;
 import java.util.*;
 
@@ -41,35 +40,46 @@ import java.util.*;
  */
 
 public class CachetGatingWaitForResourcesStep extends Step implements Serializable {
-
+    private final int timeLimit;
     private final List<String> resources;
 
     @DataBoundConstructor
-    public CachetGatingWaitForResourcesStep(List<String> resources) {
+    public CachetGatingWaitForResourcesStep(int timeLimit,List<String> resources) {
         this.resources = new ArrayList<>(resources);
+        if (timeLimit == 0) this.timeLimit = Integer.MAX_VALUE;
+        else{
+            this.timeLimit = timeLimit;
+        }
     }
 
     public List<String> getResources(){
         return resources;
     }
 
+    public int getTimeLimit() {
+        return timeLimit;
+    }
+
     @Override
     public StepExecution start(StepContext context) throws Exception {
-        return new Execution(resources, context);
+        return new Execution(timeLimit, resources, context);
     }
 
     public static class Execution extends SynchronousStepExecution<Map<String, Long>> {
 
+        private transient final int timeLimit;
         private transient final List<String> resources;
 
         private static final float RECURRENCE_PERIOD_BACKOFF = 1.2f;
-        static final long MIN_RECURRENCE_PERIOD = 250; // ¼s
-        static final long MAX_RECURRENCE_PERIOD = 15000; // ¼min
+        static final long MIN_RECURRENCE_PERIOD = 15000; // ¼min
+        static final long MAX_RECURRENCE_PERIOD = 45000;
+        static long TIME_SO_FAR = 0;
         long recurrencePeriod = MIN_RECURRENCE_PERIOD;
 
-        Execution(List<String> resources, StepContext context) {
+        Execution(int timeLimit, List<String> resources, StepContext context) {
             super(context);
             this.resources = resources;
+            this.timeLimit = timeLimit;
         }
 
         @Override
@@ -77,40 +87,43 @@ public class CachetGatingWaitForResourcesStep extends Step implements Serializab
             Map<String, Long> waitForResourcesMet = new HashMap<>();
             List<String> resourcesToWaitFor = new ArrayList<>();
 
-            Map<String, CachetGatingMetrics> metrics = getCurrentMetrics();
-
+            Map<String, CachetGatingMetrics> metrics = getActionMetrics();
+            // First iteration over metrics to determine if there is a resource we should wait for
             for (String resource : resources){
                 if(!metrics.containsKey(resource))
                     throw new AbortException("One or more resources you want to wait for does not exist.");
 
                 CachetGatingMetrics tmpResourceMet = metrics.get(resource);
-                if(tmpResourceMet.getGatingStatus().equals("Operational")){
+                if(tmpResourceMet.getGatingStatus() == ResourceStatus.OPERATIONAL){
                     waitForResourcesMet.put(resource, tmpResourceMet.getGatedTimeElapsed());
                 }
                 else {
                     resourcesToWaitFor.add(resource);
                 }
             }
-            
+
+            long timeInMillis = TimeUnit.MINUTES.toMillis(timeLimit);
             while (!resourcesToWaitFor.isEmpty()){// So there are resources we need to wait for
                 sleepingHandler(resourcesToWaitFor);
-                for (String resource : resourcesToWaitFor){
-                    CachetGatingMetrics tmpResourceMet = getCurrentMetrics().get(resource);
-                    if(tmpResourceMet.getGatingStatus().equals("Operational")){
-                        resourcesToWaitFor.remove(resource);
+
+                for (Iterator<String> iterator = resourcesToWaitFor.iterator(); iterator.hasNext();) {
+                    String resource = iterator.next();
+                    Resource tmpResource = getCurrentMetrics(resourcesToWaitFor).get(resource);
+                    if(tmpResource != null
+                            && tmpResource.getStatusName().equals("Operational")){
+                        iterator.remove();
+                        CachetGatingMetrics tmpResourceMet =  metrics.get(resource);
+                        tmpResourceMet.setGateUpdatedTime(System.currentTimeMillis());
+
                         waitForResourcesMet.put(resource, tmpResourceMet.getGatedTimeElapsed());
                     }
                 }
+                if(timeInMillis <= TIME_SO_FAR) break;
             }
-          return waitForResourcesMet;
+            return waitForResourcesMet;
         }
 
-        /**
-         * Help method
-         * @return The current metrics
-         * @throws Exception
-         */
-        public Map<String, CachetGatingMetrics> getCurrentMetrics() throws Exception {
+        private Map<String, CachetGatingMetrics> getActionMetrics() throws Exception {
             Run run = getContext().get(Run.class);
             Action action = run.getAction(com.redhat.jenkins.plugins.cachet.CachetGatingAction.class);
             if (action == null) {
@@ -119,15 +132,14 @@ public class CachetGatingWaitForResourcesStep extends Step implements Serializab
             return ((CachetGatingAction) action).getGatingMetricsMap();
         }
 
-        /**
-         * Handle the waiting for the resources
-         * @param listener
-         * @param resourcesToWaitFor
-         * @throws Exception
-         */
-        public void sleepingHandler(List<String> resourcesToWaitFor) throws Exception {
+        private Map <String, Resource> getCurrentMetrics(List<String> resources) {
+            return ResourceProvider.SINGLETON.getResources(resources);
+        }
+
+        private void sleepingHandler(List<String> resourcesToWaitFor) throws Exception {
             TaskListener listener = getContext().get(TaskListener.class);
             listener.getLogger().println("Waiting for " + resourcesToWaitFor.toString() + " for " + recurrencePeriod + " ms");
+            TIME_SO_FAR += recurrencePeriod;
             Thread.sleep(recurrencePeriod);
             recurrencePeriod = Math.min((long)(recurrencePeriod * RECURRENCE_PERIOD_BACKOFF), MAX_RECURRENCE_PERIOD);
         }
@@ -141,7 +153,7 @@ public class CachetGatingWaitForResourcesStep extends Step implements Serializab
 
         @Override
         public String getFunctionName() {
-            return "cachet-wait-for-resources";
+            return "cachetWaitForResources";
         }
 
         @Override
