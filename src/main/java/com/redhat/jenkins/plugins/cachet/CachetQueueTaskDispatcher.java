@@ -83,7 +83,7 @@ public class CachetQueueTaskDispatcher extends QueueTaskDispatcher {
                     }
                     gatingAction.setGatingMetricsMap(metricsMap);
                     item.addOrReplaceAction(gatingAction);
-                    if (msgs.size() > 0) {
+                    if (msgs.size() > 0 && !property.getSkipBlockage()) {
                         return CauseOfBlockage.fromMessage(Messages._blockedMessage(StringUtils.join(msgs, "; ")));
                     }
                 }
