@@ -209,7 +209,7 @@ public class CachetGatingPluginTest {
     @Test
     public void triggerBuildNoGating() throws Exception {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildNoGating");
-        p.addProperty(new CachetJobProperty(true, Arrays.asList("brew")));
+        p.addProperty(new CachetJobProperty(false, true, Arrays.asList("brew")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple.groovy"), false));
         WorkflowRun b = p.scheduleBuild2(0).waitForStart();
         assertNotNull(b);
@@ -219,7 +219,7 @@ public class CachetGatingPluginTest {
     @Test
     public void triggerBuildNoGatingStep() throws Exception {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildNoGatingStep");
-        p.addProperty(new CachetJobProperty(true, Arrays.asList("brew")));
+        p.addProperty(new CachetJobProperty(false,true, Arrays.asList("brew")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple-with-step.groovy"), true));
         WorkflowRun b = p.scheduleBuild2(0).waitForStart();
         assertNotNull(b);
@@ -229,7 +229,7 @@ public class CachetGatingPluginTest {
     @Test
     public void triggerBuildGating() throws Exception {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildGating");
-        p.addProperty(new CachetJobProperty(true, Arrays.asList("brew")));
+        p.addProperty(new CachetJobProperty(false, true, Arrays.asList("brew")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple.groovy"), false));
         stubFor(brewOutage);
         ResourceUpdater.setResources();
@@ -259,7 +259,7 @@ public class CachetGatingPluginTest {
     @Test
     public void triggerBuildGatingStep() throws Exception {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildGatingStep");
-        p.addProperty(new CachetJobProperty(true, Arrays.asList("brew")));
+        p.addProperty(new CachetJobProperty(false, true, Arrays.asList("brew")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple-with-step.groovy"), true));
         stubFor(brewOutage);
         ResourceUpdater.setResources();
@@ -290,16 +290,13 @@ public class CachetGatingPluginTest {
     @Test
     public void triggerBuildGatingOperationalStep() throws Exception {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildGatingOperationalStep");
-        p.addProperty(new CachetJobProperty(true, Arrays.asList("errata")));
+        p.addProperty(new CachetJobProperty(false, true, Arrays.asList("errata")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple-with-step.groovy"), true));
         stubFor(normal);
         ResourceUpdater.setResources();
 
-        QueueTaskFuture<WorkflowRun> item = p.scheduleBuild2(0);
-        assertNotNull(item);
+        WorkflowRun b2 = j.buildAndAssertSuccess(p);
 
-        WorkflowRun b2 = item.get();
-        j.assertBuildStatusSuccess(j.waitForCompletion(b2));
         List<String> log = b2.getLog(1000);
         for (String s: log) {
             System.out.println(s);

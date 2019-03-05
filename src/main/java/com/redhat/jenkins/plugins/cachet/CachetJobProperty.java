@@ -33,14 +33,23 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * THE SOFTWARE.
  */
 public class CachetJobProperty extends JobProperty<Job<?, ?>> {
-
+    private Boolean skipBlockage;
     private Boolean requiredResources;
     private List<String> resources;
 
     @DataBoundConstructor
-    public CachetJobProperty(Boolean requiredResources, List<String> resources) {
+    public CachetJobProperty(Boolean skipBlockage, Boolean requiredResources, List<String> resources) {
+        this.skipBlockage = skipBlockage;
         this.requiredResources = requiredResources;
         this.resources = resources;
+    }
+
+    public Boolean getSkipBlockage() {
+        return skipBlockage;
+    }
+
+    public void setSkipBlockage(Boolean skipBlockage) {
+        this.skipBlockage = skipBlockage;
     }
 
     public Boolean getRequiredResources() {
