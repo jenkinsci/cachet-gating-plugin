@@ -45,5 +45,8 @@
         </j:forEach>
       </select>
     </f:entry>
+    <f:entry>
+      <f:checkbox field="skipBlockage" title="Skip Blockage?"/>
+    </f:entry>
   </f:optionalBlock>
 </j:jelly>
