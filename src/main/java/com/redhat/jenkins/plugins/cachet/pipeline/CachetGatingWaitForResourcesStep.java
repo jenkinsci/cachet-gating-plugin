@@ -41,15 +41,14 @@ import java.util.*;
 
 public class CachetGatingWaitForResourcesStep extends Step implements Serializable {
     private final int timeLimit;
+    private final boolean abortWhenTimeExceeded;
     private final List<String> resources;
 
     @DataBoundConstructor
-    public CachetGatingWaitForResourcesStep(int timeLimit,List<String> resources) {
+    public CachetGatingWaitForResourcesStep(boolean abortWhenTimeExceeded, int timeLimit,List<String> resources) {
         this.resources = new ArrayList<>(resources);
-        if (timeLimit == 0) this.timeLimit = Integer.MAX_VALUE;
-        else{
-            this.timeLimit = timeLimit;
-        }
+        this.timeLimit = timeLimit;
+        this.abortWhenTimeExceeded = abortWhenTimeExceeded;
     }
 
     public List<String> getResources(){
@@ -60,14 +59,21 @@ public class CachetGatingWaitForResourcesStep extends Step implements Serializab
         return timeLimit;
     }
 
+    public boolean isAbortWhenTimeExceeded() {
+        return abortWhenTimeExceeded;
+    }
+
     @Override
     public StepExecution start(StepContext context) throws Exception {
-        return new Execution(timeLimit, resources, context);
+        return new Execution(abortWhenTimeExceeded, timeLimit, resources, context);
     }
 
     public static class Execution extends SynchronousStepExecution<Map<String, Long>> {
-
+        /**
+         * Time limit in seconds
+         */
         private transient final int timeLimit;
+        private transient final boolean abortWhenTimeExceeded;
         private transient final List<String> resources;
 
         private static final float RECURRENCE_PERIOD_BACKOFF = 1.2f;
@@ -76,10 +82,11 @@ public class CachetGatingWaitForResourcesStep extends Step implements Serializab
         static long TIME_SO_FAR = 0;
         long recurrencePeriod = MIN_RECURRENCE_PERIOD;
 
-        Execution(int timeLimit, List<String> resources, StepContext context) {
+        Execution(boolean abortWhenTimeExceeded, int timeLimit, List<String> resources, StepContext context) {
             super(context);
             this.resources = resources;
             this.timeLimit = timeLimit;
+            this.abortWhenTimeExceeded = abortWhenTimeExceeded;
         }
 
         @Override
@@ -101,8 +108,7 @@ public class CachetGatingWaitForResourcesStep extends Step implements Serializab
                     resourcesToWaitFor.add(resource);
                 }
             }
-
-            long timeInMillis = TimeUnit.MINUTES.toMillis(timeLimit);
+            long timeInMillis = TimeUnit.SECONDS.toMillis(timeLimit);
             while (!resourcesToWaitFor.isEmpty()){// So there are resources we need to wait for
                 sleepingHandler(resourcesToWaitFor);
 
@@ -118,7 +124,10 @@ public class CachetGatingWaitForResourcesStep extends Step implements Serializab
                         waitForResourcesMet.put(resource, tmpResourceMet.getGatedTimeElapsed());
                     }
                 }
-                if(timeInMillis <= TIME_SO_FAR) break;
+                if(timeInMillis <= TIME_SO_FAR && timeLimit != 0){
+                    if(abortWhenTimeExceeded) throw new AbortException("Time limit exceeded - aborting ..");
+                    else break;
+                }
             }
             return waitForResourcesMet;
         }

@@ -219,7 +219,7 @@ public class CachetGatingPluginTest {
     @Test
     public void triggerBuildNoGatingStep() throws Exception {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildNoGatingStep");
-        p.addProperty(new CachetJobProperty(false,true, Arrays.asList("brew")));
+        p.addProperty(new CachetJobProperty(false, true, Arrays.asList("brew")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple-with-step.groovy"), true));
         WorkflowRun b = p.scheduleBuild2(0).waitForStart();
         assertNotNull(b);
