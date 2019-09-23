@@ -26,7 +26,6 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -35,10 +34,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 
 @Extension
@@ -105,7 +102,7 @@ public class ResourceUpdater extends PeriodicWork {
 
     public static void setResources() {
         String api = GlobalCachetConfiguration.get().getCachetUrl();
-        Boolean ignoreSSL = BooleanUtils.isTrue(GlobalCachetConfiguration.get().getIgnoreSSL());
+        boolean ignoreSSL = BooleanUtils.isTrue(GlobalCachetConfiguration.get().isIgnoreSSL());
         log.info("Refreshing resources from " + api);
 
         if (!StringUtils.isEmpty(api)) {
