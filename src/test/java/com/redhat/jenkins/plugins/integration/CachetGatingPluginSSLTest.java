@@ -29,6 +29,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.redhat.jenkins.plugins.cachet.GlobalCachetConfiguration;
 import com.redhat.jenkins.plugins.cachet.ResourceProvider;
 import com.redhat.jenkins.plugins.cachet.ResourceUpdater;
+import com.redhat.jenkins.plugins.cachet.SourceTemplate;
 import hudson.Util;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
@@ -41,6 +42,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -49,6 +53,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /*
  * The MIT License
@@ -121,24 +126,22 @@ public class CachetGatingPluginSSLTest {
 
     @Test
     public void testGetResourceNames() {
-        GlobalCachetConfiguration gcc = GlobalCachetConfiguration.get();
-        gcc.setCachetUrl(TEST_CACHE_URL);
-        gcc.setIgnoreSSL(true);
-        ResourceUpdater.setResources();
+        SourceTemplate sourceTemplate = new SourceTemplate(TEST_CACHE_URL, "", true);
+        ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
 
         List<String> names = ResourceProvider.SINGLETON.getResourceNames();
+
+        assert names != null;
         assertEquals(names.size(), 11);
         assertEquals(names.toString(), "[brew, ci-rhos, covscan, dummy, errata, gerrit.host.prod.eng.bos.redhat.com, polarion, rdo-cloud, rpmdiff, umb, zabbix-sysops]");
     }
 
     @Test
     public void testGetResourceNamesSSLBroken() {
-        GlobalCachetConfiguration gcc = GlobalCachetConfiguration.get();
-        gcc.setCachetUrl(TEST_CACHE_URL);
-        gcc.setIgnoreSSL(false);
-        ResourceUpdater.setResources();
+        SourceTemplate sourceTemplate = new SourceTemplate(TEST_CACHE_URL, "", false);
+        ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
 
         List<String> names = ResourceProvider.SINGLETON.getResourceNames();
-        assertEquals(names, null);
+        assertNull(names);
     }
 }

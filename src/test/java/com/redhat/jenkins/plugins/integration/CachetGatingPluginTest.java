@@ -34,9 +34,7 @@ import static org.junit.Assert.assertTrue;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.common.ConsoleNotifier;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.redhat.jenkins.plugins.cachet.CachetGatingAction;
-import com.redhat.jenkins.plugins.cachet.CachetGatingMetrics;
-import com.redhat.jenkins.plugins.cachet.CachetJobProperty;
+import com.redhat.jenkins.plugins.cachet.*;
 import hudson.Util;
 
 import java.io.File;
@@ -44,10 +42,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import hudson.model.queue.QueueTaskFuture;
 import hudson.util.IOUtils;
@@ -63,11 +58,6 @@ import org.jvnet.hudson.test.JenkinsRule;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.redhat.jenkins.plugins.cachet.GlobalCachetConfiguration;
-import com.redhat.jenkins.plugins.cachet.Resource;
-import com.redhat.jenkins.plugins.cachet.ResourceProvider;
-import com.redhat.jenkins.plugins.cachet.ResourceStatus;
-import com.redhat.jenkins.plugins.cachet.ResourceUpdater;
 
 /*
  * The MIT License
@@ -120,14 +110,15 @@ public class CachetGatingPluginTest {
                 // Statically set the HTTP port number. Defaults to 8080.
                 .port(SERVICE_PORT).notifier(new ConsoleNotifier(true));
 
-        GlobalCachetConfiguration gcc = GlobalCachetConfiguration.get();
-        gcc.setCachetUrl(TEST_CACHE_URL);
+        GlobalCachetConfiguration gcc = new GlobalCachetConfiguration();
+        SourceTemplate sourceTemplate = new SourceTemplate(TEST_CACHE_URL, "", false);
+        gcc.setSources(new ArrayList<>(Collections.singletonList(sourceTemplate)));
 
         normal = get(urlMatching("/" + TEST_CACHE_CONTEXT + ".+")).withId(mockID).willReturn(ok("resources.txt"));
         brewOutage = get(urlMatching("/" + TEST_CACHE_CONTEXT + ".+")).withId(mockID).willReturn(ok("resources-brew-outage.txt"));
 
         stubFor(normal);
-        ResourceUpdater.setResources();
+        ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
     }
 
     /**
@@ -158,6 +149,7 @@ public class CachetGatingPluginTest {
     @Test
     public void testGetResourceNames() {
         List<String> names = ResourceProvider.SINGLETON.getResourceNames();
+        assert names != null;
         assertEquals(names.size(), 11);
         assertEquals(names.toString(), "[brew, ci-rhos, covscan, dummy, errata, gerrit.host.prod.eng.bos.redhat.com, polarion, rdo-cloud, rpmdiff, umb, zabbix-sysops]");
     }
@@ -189,7 +181,7 @@ public class CachetGatingPluginTest {
 
     @Test
     public void testGetUnknownResource() {
-        Map<String, Resource> resources = ResourceProvider.SINGLETON.getResources(Arrays.asList("garbage"));
+        Map<String, Resource> resources = ResourceProvider.SINGLETON.getResources(Collections.singletonList("garbage"));
         assertNotNull(resources);
         assertEquals(resources.keySet().size(), 1);
         Resource garbage = resources.get("garbage");
@@ -209,9 +201,9 @@ public class CachetGatingPluginTest {
     @Test
     public void triggerBuildNoGating() throws Exception {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildNoGating");
-        p.addProperty(new CachetJobProperty(true, Arrays.asList("brew")));
+        p.addProperty(new CachetJobProperty(true, Collections.singletonList("brew")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple.groovy"), false));
-        WorkflowRun b = p.scheduleBuild2(0).waitForStart();
+        WorkflowRun b = Objects.requireNonNull(p.scheduleBuild2(0)).waitForStart();
         assertNotNull(b);
         j.assertBuildStatusSuccess(j.waitForCompletion(b));
     }
@@ -219,9 +211,9 @@ public class CachetGatingPluginTest {
     @Test
     public void triggerBuildNoGatingStep() throws Exception {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildNoGatingStep");
-        p.addProperty(new CachetJobProperty(true, Arrays.asList("brew")));
+        p.addProperty(new CachetJobProperty(true, Collections.singletonList("brew")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple-with-step.groovy"), true));
-        WorkflowRun b = p.scheduleBuild2(0).waitForStart();
+        WorkflowRun b = Objects.requireNonNull(p.scheduleBuild2(0)).waitForStart();
         assertNotNull(b);
         j.assertBuildStatusSuccess(j.waitForCompletion(b));
     }
@@ -229,18 +221,19 @@ public class CachetGatingPluginTest {
     @Test
     public void triggerBuildGating() throws Exception {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildGating");
-        p.addProperty(new CachetJobProperty(true, Arrays.asList("brew")));
+        p.addProperty(new CachetJobProperty(true, Collections.singletonList("brew")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple.groovy"), false));
         stubFor(brewOutage);
-        ResourceUpdater.setResources();
+        SourceTemplate sourceTemplate = new SourceTemplate(TEST_CACHE_URL, "", false);
+        ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
 
         QueueTaskFuture<WorkflowRun> item = p.scheduleBuild2(0);
         assertNotNull(item);
 
-        Thread.currentThread().sleep(10000);
+        Thread.sleep(10000);
 
         stubFor(normal);
-        ResourceUpdater.setResources();
+        ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
 
         WorkflowRun b2 = item.get();
         j.assertBuildStatusSuccess(j.waitForCompletion(b2));
@@ -259,18 +252,19 @@ public class CachetGatingPluginTest {
     @Test
     public void triggerBuildGatingStep() throws Exception {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildGatingStep");
-        p.addProperty(new CachetJobProperty(true, Arrays.asList("brew")));
+        p.addProperty(new CachetJobProperty(true, Collections.singletonList("brew")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple-with-step.groovy"), true));
         stubFor(brewOutage);
-        ResourceUpdater.setResources();
+        SourceTemplate sourceTemplate = new SourceTemplate(TEST_CACHE_URL, "", false);
+        ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
 
         QueueTaskFuture<WorkflowRun> item = p.scheduleBuild2(0);
         assertNotNull(item);
 
-        Thread.currentThread().sleep(10000);
+        Thread.sleep(10000);
 
         stubFor(normal);
-        ResourceUpdater.setResources();
+        ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
 
         WorkflowRun b2 = item.get();
         j.assertBuildStatusSuccess(j.waitForCompletion(b2));
@@ -290,10 +284,11 @@ public class CachetGatingPluginTest {
     @Test
     public void triggerBuildGatingOperationalStep() throws Exception {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildGatingOperationalStep");
-        p.addProperty(new CachetJobProperty(true, Arrays.asList("errata")));
+        p.addProperty(new CachetJobProperty(true, Collections.singletonList("errata")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple-with-step.groovy"), true));
         stubFor(normal);
-        ResourceUpdater.setResources();
+        SourceTemplate sourceTemplate = new SourceTemplate(TEST_CACHE_URL, "", false);
+        ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
 
         QueueTaskFuture<WorkflowRun> item = p.scheduleBuild2(0);
         assertNotNull(item);
@@ -312,7 +307,7 @@ public class CachetGatingPluginTest {
         j.assertLogContains(ResourceStatus.OPERATIONAL.toString(), b2);
     }
 
-    protected String loadPipelineScript(String name) {
+    private String loadPipelineScript(String name) {
         try {
             return new String(IOUtils.toByteArray(getClass().getResourceAsStream(name)));
         } catch (Throwable t) {

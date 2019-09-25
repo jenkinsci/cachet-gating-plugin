@@ -5,12 +5,16 @@ import hudson.ExtensionList;
 
 import javax.annotation.Nonnull;
 
+import hudson.model.Failure;
 import jenkins.model.GlobalConfiguration;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
+import java.util.*;
 /*
  * The MIT License
  *
@@ -38,31 +42,23 @@ import org.kohsuke.stapler.StaplerRequest;
 @Extension
 public final class GlobalCachetConfiguration extends GlobalConfiguration {
 
-    private String cachetUrl;
-    private boolean ignoreSSL;
+    private List<SourceTemplate> sources = new ArrayList<>();
 
+    @DataBoundConstructor
     public GlobalCachetConfiguration() {
         load();
     }
 
     @DataBoundSetter
-    public void setCachetUrl(String cachetUrl) {
-        this.cachetUrl = cachetUrl;
+    public void setSources(List<SourceTemplate> sources) {
+        this.sources = sources;
     }
 
-    public String getCachetUrl() {
-        return cachetUrl;
+    public List<SourceTemplate> getSources() {
+        return sources != null ? sources : Collections.emptyList();
     }
 
-    @DataBoundSetter
-    public void setIgnoreSSL(boolean ignoreSSL) {
-        this.ignoreSSL = ignoreSSL;
-    }
-
-    public boolean isIgnoreSSL() {
-        return ignoreSSL;
-    }
-
+    @Nonnull
     @Override
     public String getDisplayName() {
         return Messages.pluginName();
@@ -70,6 +66,25 @@ public final class GlobalCachetConfiguration extends GlobalConfiguration {
 
     @Override
     public boolean configure(StaplerRequest req, JSONObject json) {
+        HashMap<String, String> urls = new HashMap<>();
+        HashMap<String, String> labels = new HashMap<>();
+        Object obj = json.get("sources");
+        if (obj instanceof JSONArray) {
+            JSONArray arr = (JSONArray) obj;
+            for (Object obj2 : arr) {
+                JSONObject providerObj = (JSONObject) obj2;
+                String url = providerObj.getString("cachetUrl");
+                String label = providerObj.getString("label");
+                if (urls.containsKey(url)) {
+                    throw new Failure("Attempt adding duplicate Cachet urls - " + url);
+                }
+                if (labels.containsKey(label)) {
+                    throw new Failure("Attempt adding duplicate labels - " + label);
+                }
+                urls.put(url, url);
+                labels.put(label, label);
+            }
+        }
         req.bindJSON(this, json);
         save();
         return true;

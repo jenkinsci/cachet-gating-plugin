@@ -1,10 +1,6 @@
 package com.redhat.jenkins.plugins.cachet;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,7 +19,7 @@ public enum ResourceProvider {
     private Map<String, JsonNode> resources;
 
     void setResources(Map<String, JsonNode> resources) {
-        lock.writeLock().lock();;
+        lock.writeLock().lock();
         try {
             this.resources = resources;
         } catch (Exception e) {
@@ -33,8 +29,13 @@ public enum ResourceProvider {
         }
     }
 
+    /* Avoid findbugs complains */
+    public void setResourcesForTests(Map<String, JsonNode> resources){
+        setResources(resources);
+    }
+
     public Resource getResource(String name) {
-        Map<String, Resource> resources = getResources(Arrays.asList(name));
+        Map<String, Resource> resources = getResources(Collections.singletonList(name));
         if (resources != null) {
             return resources.get(name);
         }
@@ -73,7 +74,7 @@ public enum ResourceProvider {
         if (resources != null) {
             lock.readLock().lock();
             try {
-                return new ArrayList<String>(resources.keySet());
+                return new ArrayList<>(resources.keySet());
             } catch (Exception e) {
                 log.log(Level.SEVERE, "Unhandled exception getting resource names.", e);
             } finally {
