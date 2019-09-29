@@ -58,9 +58,15 @@ public class ResourceUpdater extends PeriodicWork {
 
     @Override
     protected void doRun() {
-        List<SourceTemplate> sources = GlobalCachetConfiguration.get().getSources();
+        GlobalCachetConfiguration gcc = GlobalCachetConfiguration.get();
+        List<SourceTemplate> sources = gcc.getSources();
+        String cachetUrl = gcc.getCachetUrl();
+        Map<String, JsonNode> rmap = new TreeMap<>();
+
+        if (!StringUtils.isEmpty(cachetUrl)){
+            rmap.putAll(getResources(new SourceTemplate(cachetUrl, gcc.getLabel(), gcc.isIgnoreSSL())));
+        }
         if (!sources.isEmpty()) {
-            Map<String, JsonNode> rmap = new TreeMap<>();
             sources.forEach(source -> {
                 Map<String, JsonNode> tmpMap = getResources(source);
 
@@ -71,12 +77,12 @@ public class ResourceUpdater extends PeriodicWork {
                         else log.warning("Resource " + resourceName + " will be overwritten with " +
                                 "new data, to avoid this please add a label for " + source.getCachetUrl());
                     }
-                    rmap.put(resourceName,resourceData);
+                    rmap.put(resourceName, resourceData);
                 });
             });
-            ResourceProvider.SINGLETON.setResourcesForTests(rmap);
-            log.info("Resources: " + (!rmap.isEmpty() ? rmap.keySet().toString() : "<none>"));
         }
+        ResourceProvider.SINGLETON.setResources(rmap);
+        log.info("Cachet Resources: " + (!rmap.isEmpty() ? rmap.keySet().toString() : "<none>"));
     }
 
     private static SSLContext buildAllowAnythingSSLContext() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {

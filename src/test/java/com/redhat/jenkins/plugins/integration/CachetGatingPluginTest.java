@@ -34,7 +34,17 @@ import static org.junit.Assert.assertTrue;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.common.ConsoleNotifier;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.redhat.jenkins.plugins.cachet.*;
+
+import com.redhat.jenkins.plugins.cachet.GlobalCachetConfiguration;
+import com.redhat.jenkins.plugins.cachet.CachetGatingAction;
+import com.redhat.jenkins.plugins.cachet.CachetGatingMetrics;
+import com.redhat.jenkins.plugins.cachet.CachetJobProperty;
+import com.redhat.jenkins.plugins.cachet.Resource;
+import com.redhat.jenkins.plugins.cachet.ResourceUpdater;
+import com.redhat.jenkins.plugins.cachet.ResourceProvider;
+import com.redhat.jenkins.plugins.cachet.ResourceStatus;
+import com.redhat.jenkins.plugins.cachet.SourceTemplate;
+
 import hudson.Util;
 
 import java.io.File;
@@ -42,7 +52,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.Map;
+import java.util.Arrays;
+import java.util.Objects;
 
 import hudson.model.queue.QueueTaskFuture;
 import hudson.util.IOUtils;

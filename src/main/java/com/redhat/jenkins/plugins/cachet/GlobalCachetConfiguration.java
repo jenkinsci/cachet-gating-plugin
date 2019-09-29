@@ -6,15 +6,21 @@ import hudson.ExtensionList;
 import javax.annotation.Nonnull;
 
 import hudson.model.Failure;
+import hudson.util.FormValidation;
 import jenkins.model.GlobalConfiguration;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 /*
  * The MIT License
  *
@@ -41,6 +47,9 @@ import java.util.*;
 
 @Extension
 public final class GlobalCachetConfiguration extends GlobalConfiguration {
+    private String cachetUrl;
+    private String label;
+    private boolean ignoreSSL;
 
     private List<SourceTemplate> sources = new ArrayList<>();
 
@@ -49,13 +58,40 @@ public final class GlobalCachetConfiguration extends GlobalConfiguration {
         load();
     }
 
+    public String getCachetUrl() {
+        return cachetUrl;
+    }
+
     @DataBoundSetter
-    public void setSources(List<SourceTemplate> sources) {
-        this.sources = sources;
+    public void setCachetUrl(String cachetUrl) {
+        this.cachetUrl = cachetUrl;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    @DataBoundSetter
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public boolean isIgnoreSSL() {
+        return ignoreSSL;
+    }
+
+    @DataBoundSetter
+    public void setIgnoreSSL(boolean ignoreSSL) {
+        this.ignoreSSL = ignoreSSL;
     }
 
     public List<SourceTemplate> getSources() {
         return sources != null ? sources : Collections.emptyList();
+    }
+
+    @DataBoundSetter
+    public void setSources(List<SourceTemplate> sources) {
+        this.sources = sources;
     }
 
     @Nonnull
@@ -68,8 +104,25 @@ public final class GlobalCachetConfiguration extends GlobalConfiguration {
     public boolean configure(StaplerRequest req, JSONObject json) {
         HashMap<String, String> urls = new HashMap<>();
         HashMap<String, String> labels = new HashMap<>();
+
+        String mainUrl = json.get("cachetUrl").toString();
+        String mainLabel = json.get("label").toString();
+        urls.put(mainUrl, mainUrl);
+        labels.put(mainLabel, mainLabel);
+
         Object obj = json.get("sources");
-        if (obj instanceof JSONArray) {
+        if (obj == null) getSources().clear();
+        else if (obj instanceof JSONObject){
+            String url = ((JSONObject) obj).get("cachetUrl").toString();
+            String label = ((JSONObject) obj).get("label").toString();
+            if (mainUrl.equals(url)) {
+                throw new Failure("Attempt adding duplicate Cachet urls - " + url);
+            }
+            if (mainLabel.equals(label) && !StringUtils.isEmpty(label)) {
+                throw new Failure("Attempt adding duplicate labels - " + label);
+            }
+        }
+        else if (obj instanceof JSONArray) {
             JSONArray arr = (JSONArray) obj;
             for (Object obj2 : arr) {
                 JSONObject providerObj = (JSONObject) obj2;
@@ -78,7 +131,7 @@ public final class GlobalCachetConfiguration extends GlobalConfiguration {
                 if (urls.containsKey(url)) {
                     throw new Failure("Attempt adding duplicate Cachet urls - " + url);
                 }
-                if (labels.containsKey(label)) {
+                if (labels.containsKey(label) && !StringUtils.isEmpty(label)) {
                     throw new Failure("Attempt adding duplicate labels - " + label);
                 }
                 urls.put(url, url);
@@ -94,5 +147,12 @@ public final class GlobalCachetConfiguration extends GlobalConfiguration {
         ExtensionList<GlobalCachetConfiguration> extensions = ExtensionList.lookup(GlobalCachetConfiguration.class);
         assert extensions.size() == 1: "One cachet configuration expected, got " + extensions.size();
         return extensions.get(0);
+    }
+
+    public FormValidation doCheckCachetUrl(@QueryParameter String cachetUrl){
+        if(StringUtils.isEmpty(cachetUrl)){
+            return FormValidation.warning("Please provide a Cachet Url");
+        }
+        return FormValidation.ok();
     }
 }

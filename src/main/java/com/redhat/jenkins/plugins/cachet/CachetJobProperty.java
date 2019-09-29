@@ -69,7 +69,6 @@ public class CachetJobProperty extends JobProperty<Job<?, ?>> {
 
         public List<String> getResourceNames() {
             return ResourceProvider.SINGLETON.getResourceNames();
-
         }
     }
 }

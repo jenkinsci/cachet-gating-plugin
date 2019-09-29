@@ -1,0 +1,18 @@
+<div>
+    <b>To use in cases when you have multiple cachet sources.</b>
+    <br>
+    Sometimes resources can have the same name (e.g. <code>beaker</code>) but they are pointing to a different server, so to avoid overriding use <code>label</code>.
+    <p>
+        <b>For example:</b> <br>
+        Let's say we have 2 cachet sources.
+        <ul>
+            <li>https://cachet.io/api/v1</li>
+            <li>https://cachet.io/api/v2</li>
+        </ul>
+        On both of them we have a resource called <code>beaker</code>,
+        if we won't use a label the <code>beaker</code> resource will be overridden. <br>
+        Use a label to distinguish between the cachet sources
+        (e.g. internal/external/...) so now the resource will be called <code>[&lt;LABEL&gt;: &lt;RESOURCE_NAME&gt;]</code>
+        (e.g. <code>internal: beaker</code>).
+    </p>
+</div>

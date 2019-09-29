@@ -37,7 +37,7 @@ public class SourceTemplate extends AbstractDescribableImpl<SourceTemplate> impl
     }
 
     @Extension
-    @Symbol("sourceTemplate")
+    @Symbol("cachetSource")
     public static class DescriptorImpl extends Descriptor<SourceTemplate> {
         @Nonnull
         @Override

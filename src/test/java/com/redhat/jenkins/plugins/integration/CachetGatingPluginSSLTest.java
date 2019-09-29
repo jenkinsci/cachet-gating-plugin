@@ -26,7 +26,6 @@ package com.redhat.jenkins.plugins.integration;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.redhat.jenkins.plugins.cachet.GlobalCachetConfiguration;
 import com.redhat.jenkins.plugins.cachet.ResourceProvider;
 import com.redhat.jenkins.plugins.cachet.ResourceUpdater;
 import com.redhat.jenkins.plugins.cachet.SourceTemplate;
@@ -42,9 +41,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
