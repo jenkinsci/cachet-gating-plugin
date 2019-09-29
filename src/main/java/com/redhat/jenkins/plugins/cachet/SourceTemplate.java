@@ -11,11 +11,11 @@ import java.io.Serializable;
 
 public class SourceTemplate extends AbstractDescribableImpl<SourceTemplate> implements Serializable {
 
-    private static final long serialVersionUID = 4112681620416495146L;
+    private static final long serialVersionUID = 2711426306506317834L;
 
-    private String cachetUrl;
-    private String label;
-    private boolean ignoreSSL;
+    private final String cachetUrl;
+    private final String label;
+    private final boolean ignoreSSL;
 
     @DataBoundConstructor
     public SourceTemplate(String cachetUrl, String label, boolean ignoreSSL) {
@@ -24,27 +24,15 @@ public class SourceTemplate extends AbstractDescribableImpl<SourceTemplate> impl
         this.ignoreSSL = ignoreSSL;
     }
 
-    public void setCachetUrl(String cachetUrl) {
-        this.cachetUrl = cachetUrl;
-    }
-
-    String getCachetUrl() {
+    public String getCachetUrl() {
         return cachetUrl;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     public String getLabel() {
         return label;
     }
 
-    public void setIgnoreSSL(boolean ignoreSSL) {
-        this.ignoreSSL = ignoreSSL;
-    }
-
-    boolean isIgnoreSSL() {
+    public boolean isIgnoreSSL() {
         return ignoreSSL;
     }
 
