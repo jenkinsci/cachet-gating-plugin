@@ -7,7 +7,6 @@ import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixProject;
 import hudson.model.Action;
 import hudson.model.Item;
-import hudson.model.JobProperty;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerProxy;
@@ -117,7 +116,7 @@ public class CachetMatrixAction implements Action, StaplerProxy {
      * @param resources
      * @throws IOException
      */
-    private void setCachetProperty(Combination combination, List<String> resources)
+    protected void setCachetProperty(Combination combination, List<String> resources)
             throws IOException {
         MatrixConfiguration matrixConfiguration = project.getItem(combination);
         matrixConfiguration.removeProperty(CachetJobProperty.class);
