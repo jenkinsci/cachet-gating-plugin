@@ -1,0 +1,40 @@
+
+
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form">
+    <l:layout title="Cachet Configuration">
+        <l:main-panel>
+            <h1> Cachet Configuration </h1>
+            <h2> Configuration Status </h2>
+            <f:form action="save" method="post" name="cachet-conf">
+                <j:forEach var="axis" items="${it.axis}">
+                    <j:set var="axis_name" value="${axis.toString()}"/>
+                    <f:optionalBlock title="${axis_name}" name="${axis_name}" checked="${it.isChecked(axis_name)}">
+                        <f:section title="Select resources for ${axis_name}">
+                            <f:entry>
+                                <select name="resources" multiple="multiple" size="5">
+                                    <j:set var="allResources" value="${it.getResourceNames()}"/>
+                                    <j:forEach var="aResource" items="${allResources}" varStatus="loop">
+                                        <j:choose>
+                                            <j:when test="${it.isSelected(axis_name,aResource)}">
+                                                <option value="${aResource}" selected="selected">${aResource}</option>
+                                            </j:when>
+                                            <j:otherwise>
+                                                <option value="${aResource}">${aResource}</option>
+                                            </j:otherwise>
+                                        </j:choose>
+                                    </j:forEach>
+                                </select>
+                            </f:entry>
+                        </f:section>
+                    </f:optionalBlock>
+                </j:forEach>
+                <f:entry>
+                    <f:submit value="${%Save}" name="save" />
+                    <f:submit value="${%Apply}" name="apply" />
+                </f:entry>
+            </f:form>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>
+
