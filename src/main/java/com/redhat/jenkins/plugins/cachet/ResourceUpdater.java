@@ -72,9 +72,7 @@ public class ResourceUpdater extends PeriodicWork {
 
                 tmpMap.forEach((resourceName, resourceData) -> {
                     if (rmap.containsKey(resourceName) && !rmap.get(resourceName).equals(resourceData)){
-                        if (!StringUtils.isEmpty(source.getLabel()))
-                            resourceName = source.getLabel() + ": " + resourceName;
-                        else log.warning("Resource " + resourceName + " will be overwritten with " +
+                        log.warning("Resource " + resourceName + " will be overwritten with " +
                                 "new data, to avoid this please add a label for " + source.getCachetUrl());
                     }
                     rmap.put(resourceName, resourceData);

@@ -12,7 +12,9 @@ import com.redhat.jenkins.plugins.cachet.CachetGatingAction;
 import com.redhat.jenkins.plugins.cachet.CachetGatingMetrics;
 import com.redhat.jenkins.plugins.cachet.CachetJobProperty;
 import com.redhat.jenkins.plugins.cachet.GlobalCachetConfiguration;
+import com.redhat.jenkins.plugins.cachet.ResourceProvider;
 import com.redhat.jenkins.plugins.cachet.ResourceUpdater;
+import com.redhat.jenkins.plugins.cachet.SourceTemplate;
 import com.redhat.jenkins.plugins.cachet.matrix.CachetAxis;
 
 import hudson.Util;
@@ -66,6 +68,8 @@ public class CachetMatrixTest {
     private MappingBuilder normal;
     private MappingBuilder brewOutage;
 
+    private SourceTemplate sourceTemplate = new SourceTemplate(TEST_CACHE_URL, "", false);
+
 
     @Before
     public void setup() {
@@ -80,7 +84,7 @@ public class CachetMatrixTest {
         brewOutage = get(urlMatching("/" + TEST_CACHE_CONTEXT + ".+")).withId(mockID).willReturn(ok("resources-brew-outage.txt"));
 
         stubFor(normal);
-        ResourceUpdater.setResources();
+        ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
     }
 
     /**
@@ -137,7 +141,7 @@ public class CachetMatrixTest {
     public void testRunningMatrix() throws Exception {
         MatrixProject p = createMatrixProject();
         stubFor(brewOutage);
-        ResourceUpdater.setResources();
+        ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
 
         QueueTaskFuture<MatrixBuild> futureTask = p.scheduleBuild2(0);
         futureTask.waitForStart();
@@ -145,7 +149,7 @@ public class CachetMatrixTest {
         Thread.sleep(10000);
 
         stubFor(normal);
-        ResourceUpdater.setResources();
+        ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
 
         MatrixBuild b1 = futureTask.get();
         List<MatrixRun> runs = b1.getExactRuns();
