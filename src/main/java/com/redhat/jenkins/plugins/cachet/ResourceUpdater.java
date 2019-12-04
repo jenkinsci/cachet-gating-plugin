@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -59,19 +57,34 @@ public class ResourceUpdater extends PeriodicWork {
     }
 
     @Override
-    protected void doRun() throws Exception {
-        if (!StringUtils.isEmpty(GlobalCachetConfiguration.get().getCachetUrl())) {
-            setResources();
+    protected void doRun() {
+        GlobalCachetConfiguration gcc = GlobalCachetConfiguration.get();
+        List<SourceTemplate> sources = gcc.getSources();
+        String cachetUrl = gcc.getCachetUrl();
+        Map<String, JsonNode> rmap = new TreeMap<>();
+
+        if (!StringUtils.isEmpty(cachetUrl)){
+            rmap.putAll(getResources(new SourceTemplate(cachetUrl, gcc.getLabel(), gcc.isIgnoreSSL())));
         }
+        if (!sources.isEmpty()) {
+            sources.forEach(source -> {
+                Map<String, JsonNode> tmpMap = getResources(source);
+
+                tmpMap.forEach((resourceName, resourceData) -> {
+                    if (rmap.containsKey(resourceName) && !rmap.get(resourceName).equals(resourceData)){
+                        log.warning("Resource " + resourceName + " will be overwritten with " +
+                                "new data, to avoid this please add a label for " + source.getCachetUrl());
+                    }
+                    rmap.put(resourceName, resourceData);
+                });
+            });
+        }
+        ResourceProvider.SINGLETON.setResources(rmap);
+        log.info("Cachet Resources: " + (!rmap.isEmpty() ? rmap.keySet().toString() : "<none>"));
     }
 
     private static SSLContext buildAllowAnythingSSLContext() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-            return SSLContexts.custom().loadTrustMaterial(null, new TrustStrategy() {
-                @Override
-                public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                    return true;
-                }
-            }).build();
+            return SSLContexts.custom().loadTrustMaterial(null, (TrustStrategy) (chain, authType) -> true).build();
     }
 
     private static CloseableHttpClient createHTTPClient(boolean ignoreSSL)
@@ -100,13 +113,13 @@ public class ResourceUpdater extends PeriodicWork {
         }
     }
 
-    public static void setResources() {
-        String api = GlobalCachetConfiguration.get().getCachetUrl();
-        boolean ignoreSSL = BooleanUtils.isTrue(GlobalCachetConfiguration.get().isIgnoreSSL());
+    public static Map<String, JsonNode> getResources(SourceTemplate sourceTemplate) {
+        String api = sourceTemplate.getCachetUrl();
+        boolean ignoreSSL = BooleanUtils.isTrue(sourceTemplate.isIgnoreSSL());
         log.info("Refreshing resources from " + api);
 
+        Map<String, JsonNode> rmap = null;
         if (!StringUtils.isEmpty(api)) {
-            Map<String, JsonNode> rmap = null;
             try (CloseableHttpClient httpClient = createHTTPClient(ignoreSSL)) {
                 rmap = new TreeMap<>();
                 String link = StringUtils.appendIfMissing(api, "/") + LIST_COMPONENTS + "?" + PER_PAGE;
@@ -119,10 +132,13 @@ public class ResourceUpdater extends PeriodicWork {
                                 JsonNode root = om.readTree(response.getEntity().getContent());
                                 ArrayNode resources = (ArrayNode) root.get(ATTRIBUTE_DATA);
                                 if (resources != null && resources.size() > 0) {
-                                    Iterator<JsonNode> i = resources.iterator();
-                                    while (i.hasNext()) {
-                                        JsonNode n = i.next();
-                                        rmap.put(n.get(ATTRIBUTE_NAME).asText(), n);
+                                    for (JsonNode n : resources) {
+                                        String label = sourceTemplate.getLabel();
+                                        if (!StringUtils.isEmpty(label)) {
+                                            rmap.put(label + ": " + n.get(ATTRIBUTE_NAME).asText(), n);
+                                        } else {
+                                            rmap.put(n.get(ATTRIBUTE_NAME).asText(), n);
+                                        }
                                     }
                                 }
                                 link = root.get(ATTRIBUTE_META).get(ATTRIBUTE_PAGINATION).get(ATTRIBUTE_LINKS).get(ATTRIBUTE_NEXT_PAGE).asText();
@@ -139,12 +155,10 @@ public class ResourceUpdater extends PeriodicWork {
             } catch (IOException | NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
                 log.log(Level.SEVERE, "Unhandled exception retrieving Cachet component list.", e);
                 rmap = null;
-            } finally {
-                ResourceProvider.SINGLETON.setResources(rmap);
-                log.info("Resources: " + (rmap != null ? rmap.keySet().toString() : "<none>"));
             }
         } else {
             log.warning("No Cachet URL set.");
         }
+        return rmap;
     }
 }
