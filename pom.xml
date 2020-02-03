@@ -30,6 +30,11 @@
       <name>Greg Allen</name>
       <email>gallen @redhat.com</email>
     </developer>
+    <developer>
+      <id>avielyosef</id>
+      <name>Aviel Yosef</name>
+      <email>ayosef@redhat.com</email>
+    </developer>
   </developers>
 
   <distributionManagement>
