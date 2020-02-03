@@ -1,5 +1,4 @@
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <!--
+ <!--
      * The MIT License
      *
      * Copyright (c) Red Hat, Inc.
@@ -23,10 +22,20 @@
      * THE SOFTWARE.
      */
   -->
-  <?jelly escape-by-default='true'?>
+ <?jelly escape-by-default='true'?>
+ <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
   <f:section title="${%Cachet Configuration}">
-    <f:entry title="Cachet API URL" field="cachetUrl">
-      <f:textbox />
+      <f:entry title="${%Cachet API URL}" field="cachetUrl">
+          <f:textbox/>
+      </f:entry>
+      <f:entry title="${%Label}" field="label">
+          <f:textbox/>
+      </f:entry>
+      <f:entry title="${%Ignore SSL?}" field="ignoreSSL" description="If checked, ignore SSL issues">
+          <f:checkbox/>
+      </f:entry>
+    <f:entry>
+        <f:repeatableHeteroProperty field="sources" hasHeader="true" addCaption="Add Source" deleteCaption="Delete Source"/>
     </f:entry>
   </f:section>
 </j:jelly>
