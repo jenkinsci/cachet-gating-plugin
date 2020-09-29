@@ -12,6 +12,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
@@ -46,6 +47,7 @@ import java.util.List;
  */
 
 @Extension
+@Symbol("cachetGating")
 public final class GlobalCachetConfiguration extends GlobalConfiguration {
     private String cachetUrl;
     private String label;

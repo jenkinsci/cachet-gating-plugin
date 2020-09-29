@@ -1,0 +1,13 @@
+unclassified:
+  cachetGating:
+    sources:
+      - cachetUrl: https://example.com/foo
+        label: foo
+      - cachetUrl: https://example.com/bar
+        label: bar
+        ignoreSSL: true
+      - cachetUrl: https://example.com/baz
+        label: baz
+        ignoreSSL: false
+    cachetUrl:  https://example.com/bax
+    label: bax

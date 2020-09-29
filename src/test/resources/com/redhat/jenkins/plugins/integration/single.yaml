@@ -1,0 +1,4 @@
+unclassified:
+  cachetGating:
+    cachetUrl: https://example.com
+    ignoreSSL: false
