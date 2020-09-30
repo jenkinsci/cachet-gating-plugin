@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -68,8 +69,7 @@ public class CachetMatrixTest {
     private MappingBuilder normal;
     private MappingBuilder brewOutage;
 
-    private SourceTemplate sourceTemplate = new SourceTemplate(TEST_CACHE_URL, "", false);
-
+    private final SourceTemplate sourceTemplate = new SourceTemplate(TEST_CACHE_URL, "", false);
 
     @Before
     public void setup() {
@@ -97,7 +97,7 @@ public class CachetMatrixTest {
             URL res = CachetGatingPluginTest.class.getResource(path);
             return Util.loadFile(
                     new File(res.toURI()),
-                    Charset.forName("UTF-8")
+                    StandardCharsets.UTF_8
             );
         } catch (IOException | URISyntaxException e) {
             throw new Error(e);
