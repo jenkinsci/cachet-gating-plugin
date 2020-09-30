@@ -34,6 +34,11 @@
       <name>Aviel Yosef</name>
       <email>ayosef@redhat.com</email>
     </developer>
+    <developer>
+      <id>olivergondza</id>
+      <name>Oliver Gondža</name>
+      <email>ogondza@gmail.com</email>
+    </developer>
   </developers>
 
   <distributionManagement>
@@ -60,7 +65,6 @@
   <properties>
     <java.level>8</java.level>
     <jenkins.version>2.62</jenkins.version>
-    <maven.javadoc.skip>true</maven.javadoc.skip>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -69,7 +73,6 @@
     <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
     <tag>cachet-gating-1.0.4</tag>
   </scm>
-
 
   <dependencies>
     <dependency>
@@ -211,71 +214,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.jenkins-ci.tools</groupId>
-        <artifactId>maven-hpi-plugin</artifactId>
-        <configuration>
-          <compatibleSinceVersion>1.0.38</compatibleSinceVersion>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <forkCount>1</forkCount>
-          <reuseForks>false</reuseForks>
-          <argLine>${argLine}</argLine>
-            <environmentVariables>
-              <JENKINS_WAR>${user.home}/.m2/repository/org/jenkins-ci/main/jenkins-war/${jenkins.version}/jenkins-war-${jenkins.version}.war</JENKINS_WAR>
-              <LOCAL_SNAPSHOTS>true</LOCAL_SNAPSHOTS>
-              <JENKINS_JAVA_OPTS2>-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=y</JENKINS_JAVA_OPTS2>
-            </environmentVariables>
-        </configuration>
-      </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-                <source>8</source>
-                <target>8</target>
-            </configuration>
-        </plugin>
-    </plugins>
-    <pluginManagement>
-      <plugins>
-      <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-          <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-              <lifecycleMappingMetadata>
-                  <pluginExecutions>
-                      <pluginExecution>
-                          <pluginExecutionFilter>
-                              <groupId>
-                                  org.apache.maven.plugins
-                              </groupId>
-                              <artifactId>
-                                  maven-javadoc-plugin
-                              </artifactId>
-                              <versionRange>[2.10.4,)</versionRange>
-                              <goals>
-                                  <goal>javadoc</goal>
-                              </goals>
-                          </pluginExecutionFilter>
-                          <action>
-                              <ignore />
-                          </action>
-                      </pluginExecution>
-                  </pluginExecutions>
-              </lifecycleMappingMetadata>
-          </configuration>
-          </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 </project>

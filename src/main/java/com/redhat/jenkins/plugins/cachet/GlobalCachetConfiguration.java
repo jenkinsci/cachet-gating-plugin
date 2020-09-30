@@ -1,27 +1,3 @@
-package com.redhat.jenkins.plugins.cachet;
-
-import hudson.Extension;
-import hudson.ExtensionList;
-
-import javax.annotation.Nonnull;
-
-import hudson.model.Failure;
-import hudson.util.FormValidation;
-import jenkins.model.GlobalConfiguration;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 /*
  * The MIT License
  *
@@ -45,6 +21,32 @@ import java.util.List;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package com.redhat.jenkins.plugins.cachet;
+
+import hudson.Extension;
+import hudson.ExtensionList;
+
+import javax.annotation.Nonnull;
+
+import hudson.model.Failure;
+import hudson.util.FormValidation;
+import jenkins.model.GlobalConfiguration;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jenkinsci.Symbol;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.DoNotUse;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 @Extension
 @Symbol("cachetGating")
@@ -151,6 +153,7 @@ public final class GlobalCachetConfiguration extends GlobalConfiguration {
         return extensions.get(0);
     }
 
+    @Restricted(DoNotUse.class)
     public FormValidation doCheckCachetUrl(@QueryParameter String cachetUrl){
         if(StringUtils.isEmpty(cachetUrl)){
             return FormValidation.warning("Please provide a Cachet Url");

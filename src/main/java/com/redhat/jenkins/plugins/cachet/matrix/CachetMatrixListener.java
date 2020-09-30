@@ -50,7 +50,6 @@ public class CachetMatrixListener extends MatrixBuildListener {
 
     /**
      * Help method to manipulate a combination into a list of resources
-     * @param combination
      * @return list of resources
      */
     private List<String> getResourcesFromCombination(Combination combination, List<String> axisNames){

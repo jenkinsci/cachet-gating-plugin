@@ -1,18 +1,3 @@
-package com.redhat.jenkins.plugins.cachet;
-
-import hudson.Extension;
-import hudson.model.Job;
-import hudson.model.Queue;
-import hudson.model.queue.QueueTaskDispatcher;
-import hudson.model.queue.CauseOfBlockage;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import org.apache.commons.lang.StringUtils;
-
 /*
  * The MIT License
  *
@@ -36,7 +21,20 @@ import org.apache.commons.lang.StringUtils;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package com.redhat.jenkins.plugins.cachet;
 
+import hudson.Extension;
+import hudson.model.Job;
+import hudson.model.Queue;
+import hudson.model.queue.QueueTaskDispatcher;
+import hudson.model.queue.CauseOfBlockage;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import org.apache.commons.lang.StringUtils;
 
 @Extension
 public class CachetQueueTaskDispatcher extends QueueTaskDispatcher {

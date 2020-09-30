@@ -1,23 +1,3 @@
-package com.redhat.jenkins.plugins.cachet.pipeline;
-
-import com.google.common.collect.ImmutableSet;
-import com.redhat.jenkins.plugins.cachet.CachetGatingAction;
-import com.redhat.jenkins.plugins.cachet.CachetGatingMetrics;
-import hudson.Extension;
-import hudson.Launcher;
-import hudson.model.Action;
-import hudson.model.Run;
-import hudson.model.TaskListener;
-import org.jenkinsci.plugins.workflow.steps.Step;
-import org.jenkinsci.plugins.workflow.steps.StepContext;
-import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
-import org.jenkinsci.plugins.workflow.steps.StepExecution;
-import org.kohsuke.stapler.DataBoundConstructor;
-
-import java.io.Serializable;
-import java.util.Map;
-import java.util.Set;
-
 /*
  * The MIT License
  *
@@ -41,7 +21,26 @@ import java.util.Set;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package com.redhat.jenkins.plugins.cachet.pipeline;
 
+import com.google.common.collect.ImmutableSet;
+import com.redhat.jenkins.plugins.cachet.CachetGatingAction;
+import com.redhat.jenkins.plugins.cachet.CachetGatingMetrics;
+import hudson.Extension;
+import hudson.Launcher;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+import org.jenkinsci.plugins.workflow.steps.Step;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
+import org.jenkinsci.plugins.workflow.steps.StepExecution;
+import org.kohsuke.stapler.DataBoundConstructor;
+
+import javax.annotation.Nonnull;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 public class CachetGatingMetricsStep extends Step implements Serializable {
 
@@ -50,26 +49,25 @@ public class CachetGatingMetricsStep extends Step implements Serializable {
     }
 
     @Override
-    public StepExecution start(StepContext context) throws Exception {
+    public StepExecution start(StepContext context) {
         return new CachetGatingMetricsStepExecution(this, context);
     }
 
     public static class CachetGatingMetricsStepExecution extends StepExecution {
-        private final CachetGatingMetricsStep step;
+        private static final long serialVersionUID = 6856767713701881593L;
 
         public CachetGatingMetricsStepExecution(CachetGatingMetricsStep s, StepContext context) {
             super(context);
-            this.step = s;
         }
 
         @Override
         public boolean start() throws Exception {
-            Run run = getContext().get(Run.class);
-            Action action = run.getAction(com.redhat.jenkins.plugins.cachet.CachetGatingAction.class);
+            Run<?, ?> run = getContext().get(Run.class);
+            CachetGatingAction action = Objects.requireNonNull(run).getAction(com.redhat.jenkins.plugins.cachet.CachetGatingAction.class);
             if (action == null) {
                 action = new CachetGatingAction();
             }
-            Map<String, CachetGatingMetrics> metrics = ((CachetGatingAction) action).getGatingMetricsMap();
+            Map<String, CachetGatingMetrics> metrics = action.getGatingMetricsMap();
             getContext().onSuccess(metrics);
             return true;
         }
@@ -90,10 +88,10 @@ public class CachetGatingMetricsStep extends Step implements Serializable {
         }
 
         @Override
-        public String getDisplayName() {
+        public @Nonnull  String getDisplayName() {
             return "Cachet Gating Metrics";
         }
     }
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
 }

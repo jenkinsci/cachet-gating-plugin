@@ -1,6 +1,5 @@
 package com.redhat.jenkins.plugins.cachet;
 
-
 public class Resource {
 
     private String name;
@@ -49,5 +48,4 @@ public class Resource {
     public void setStatusName(String statusName) {
         this.statusName = statusName;
     }
-
 }

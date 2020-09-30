@@ -1,14 +1,3 @@
-package com.redhat.jenkins.plugins.cachet;
-
-import hudson.Extension;
-import hudson.model.JobProperty;
-import hudson.model.JobPropertyDescriptor;
-import hudson.model.Job;
-
-import java.util.List;
-
-import org.kohsuke.stapler.DataBoundConstructor;
-
 /*
  * The MIT License
  *
@@ -32,6 +21,19 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package com.redhat.jenkins.plugins.cachet;
+
+import hudson.Extension;
+import hudson.model.JobProperty;
+import hudson.model.JobPropertyDescriptor;
+import hudson.model.Job;
+
+import java.util.List;
+
+import org.kohsuke.stapler.DataBoundConstructor;
+
+import javax.annotation.Nonnull;
+
 public class CachetJobProperty extends JobProperty<Job<?, ?>> {
 
     private Boolean requiredResources;
@@ -63,7 +65,7 @@ public class CachetJobProperty extends JobProperty<Job<?, ?>> {
     public static class CachetJobPropertyDescriptor extends JobPropertyDescriptor {
 
         @Override
-        public String getDisplayName() {
+        public @Nonnull String getDisplayName() {
             return Messages.pluginName();
         }
 

@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -61,7 +62,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import hudson.model.queue.QueueTaskFuture;
-import hudson.util.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -74,31 +75,6 @@ import org.jvnet.hudson.test.JenkinsRule;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-
-/*
- * The MIT License
- *
- * Copyright (c) Red Hat, Inc.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
 
 public class CachetGatingPluginTest {
     private static final int SERVICE_PORT = 32000;
@@ -117,8 +93,6 @@ public class CachetGatingPluginTest {
     private UUID mockID = UUID.randomUUID();
     private MappingBuilder normal;
     private MappingBuilder brewOutage;
-
-
 
     @Before
     public void setup() {
@@ -147,7 +121,7 @@ public class CachetGatingPluginTest {
             URL res = CachetGatingPluginTest.class.getResource(path);
             return Util.loadFile(
                     new File(res.toURI()),
-                    Charset.forName("UTF-8")
+                    StandardCharsets.UTF_8
             );
         } catch (IOException | URISyntaxException e) {
             throw new Error(e);

@@ -1,11 +1,3 @@
-package com.redhat.jenkins.plugins.cachet;
-
-import hudson.model.InvisibleAction;
-import org.jenkinsci.plugins.scriptsecurity.sandbox.whitelists.Whitelisted;
-
-import java.util.HashMap;
-import java.util.Map;
-
 /*
  * The MIT License
  *
@@ -29,14 +21,26 @@ import java.util.Map;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package com.redhat.jenkins.plugins.cachet;
 
+import hudson.model.InvisibleAction;
+import org.jenkinsci.plugins.scriptsecurity.sandbox.whitelists.Whitelisted;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CachetGatingAction extends InvisibleAction {
+
+    private Map<String, CachetGatingMetrics> gatingMetricsMap;
+
+    public CachetGatingAction() {
+        this.gatingMetricsMap = new HashMap<>();
+    }
 
     @Whitelisted
     public Map<String, CachetGatingMetrics> getGatingMetricsMap() {
         if (gatingMetricsMap == null) {
-            gatingMetricsMap = new HashMap<String, CachetGatingMetrics>();
+            gatingMetricsMap = new HashMap<>();
         }
         return gatingMetricsMap;
     }
@@ -45,20 +49,10 @@ public class CachetGatingAction extends InvisibleAction {
         this.gatingMetricsMap = gatingMetricsMap;
     }
 
-    public CachetGatingAction(Map<String, CachetGatingMetrics> gatingMetricsMap) {
-        this.gatingMetricsMap = gatingMetricsMap;
-    }
-
-    public CachetGatingAction() {
-        this.gatingMetricsMap = new HashMap<String, CachetGatingMetrics>();
-    }
-
     @Override
     public String toString() {
         return "CachetGatingAction{" +
                 "gatingMetricsMap=" + gatingMetricsMap +
                 '}';
     }
-
-    private Map<String, CachetGatingMetrics> gatingMetricsMap;
 }
