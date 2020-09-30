@@ -34,6 +34,11 @@
       <name>Aviel Yosef</name>
       <email>ayosef@redhat.com</email>
     </developer>
+    <developer>
+      <id>olivergondza</id>
+      <name>Oliver Gondža</name>
+      <email>ogondza@gmail.com</email>
+    </developer>
   </developers>
 
   <distributionManagement>
