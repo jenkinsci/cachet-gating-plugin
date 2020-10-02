@@ -49,7 +49,11 @@ import java.util.HashMap;
 import java.util.List;
 
 @Extension
-@Symbol("cachetGating")
+/* The name of the symbol sucks, but it was exposed to users via the casc plugin automagic behaviour. Ability to use multiple
+ * symbols is not available until casc 1.37 (https://github.com/jenkinsci/configuration-as-code-plugin/pull/1308), that
+ * in turn requires Jenkins 2.222 (https://github.com/jenkinsci/jenkins/pull/4450).
+ */
+@Symbol({"globalCachetConfiguration"})
 public final class GlobalCachetConfiguration extends GlobalConfiguration {
     private String cachetUrl;
     private String label;

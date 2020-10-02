@@ -1,5 +1,5 @@
 unclassified:
-  cachetGating:
+  globalCachetConfiguration:
     sources:
       - cachetUrl: https://example.com/foo
         label: foo

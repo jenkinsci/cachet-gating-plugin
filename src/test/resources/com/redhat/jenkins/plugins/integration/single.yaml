@@ -1,4 +1,4 @@
 unclassified:
-  cachetGating:
+  globalCachetConfiguration:
     cachetUrl: https://example.com
     ignoreSSL: false
