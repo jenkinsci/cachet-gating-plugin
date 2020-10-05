@@ -1,4 +1,4 @@
-# Cachet Gate Plugin
+# Cachet Gating Plugin
 
 The Cachet Gating Plugin allows jobs to be held in the Jenkins queue based on Cachet resource availability.
 
@@ -17,6 +17,19 @@ unclassified:
     cachetUrl: https://example.com
     ignoreSSL: false
 ```  
+
+Using multiple sources:
+
+```yaml
+unclassified:
+  globalCachetConfiguration:
+    sources:
+      - cachetUrl: https://example1.com/foo
+        label: example1
+      - cachetUrl: https://example2.com/v1
+        label: example2
+        ignoreSSL: true
+```
 
 ## Gating Jobs
 
