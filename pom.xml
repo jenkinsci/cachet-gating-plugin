@@ -12,9 +12,9 @@
   <artifactId>cachet-gating</artifactId>
   <version>1.0.9-SNAPSHOT</version>
   <packaging>hpi</packaging>
-  <name>Cachet Gate Plugin</name>
-  <description>Plugin to gate jobs based on Cachet resources availability.</description>
-  <url>https://wiki.jenkins-ci.org/display/JENKINS/Cachet+Gate+Plugin</url>
+  <name>Cachet Gating Plugin</name>
+  <description>Plugin to gate jobs based on Cachet resources availability</description>
+  <url>https://github.com/jenkinsci/cachet-gating-plugin</url>
 
   <licenses>
     <license>
