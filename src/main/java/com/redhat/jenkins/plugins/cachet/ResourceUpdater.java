@@ -80,7 +80,7 @@ public class ResourceUpdater extends PeriodicWork {
             });
         }
         ResourceProvider.SINGLETON.setResources(rmap);
-        log.info("Cachet Resources: " + (!rmap.isEmpty() ? rmap.keySet().toString() : "<none>"));
+        log.finer(() -> "Cachet Resources: " + (!rmap.isEmpty() ? rmap.keySet().toString() : "<none>"));
     }
 
     private static SSLContext buildAllowAnythingSSLContext() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
@@ -116,7 +116,7 @@ public class ResourceUpdater extends PeriodicWork {
     public static Map<String, JsonNode> getResources(SourceTemplate sourceTemplate) {
         String api = sourceTemplate.getCachetUrl();
         boolean ignoreSSL = BooleanUtils.isTrue(sourceTemplate.isIgnoreSSL());
-        log.info("Refreshing resources from " + api);
+        log.fine(() -> "Refreshing resources from " + api);
 
         Map<String, JsonNode> rmap = null;
         if (!StringUtils.isEmpty(api)) {
