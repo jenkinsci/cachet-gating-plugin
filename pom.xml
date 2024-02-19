@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>3.54</version>
+    <version>4.55</version>
   </parent>
 
   <artifactId>cachet-gating</artifactId>
@@ -19,21 +18,11 @@
   <licenses>
     <license>
       <name>MIT License</name>
-        <url>http://opensource.org/licenses/MIT</url>
+        <url>https://opensource.org/licenses/MIT</url>
     </license>
   </licenses>
 
   <developers>
-    <developer>
-      <id>ggallen</id>
-      <name>Greg Allen</name>
-      <email>gallen@redhat.com</email>
-    </developer>
-    <developer>
-      <id>avielyosef</id>
-      <name>Aviel Yosef</name>
-      <email>ayosef@redhat.com</email>
-    </developer>
     <developer>
       <id>olivergondza</id>
       <name>Oliver Gondža</name>
@@ -63,8 +52,8 @@
   </pluginRepositories>
 
   <properties>
-    <java.level>8</java.level>
-    <jenkins.version>2.62</jenkins.version>
+    <java.level>17</java.level>
+    <jenkins.version>2.414.3</jenkins.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -74,131 +63,115 @@
     <tag>cachet-gating-1.0.4</tag>
   </scm>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.jenkins.tools.bom</groupId>
+        <artifactId>bom-2.414.x</artifactId>
+        <version>2815.vf5d6f093b_23e</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>matrix-project</artifactId>
-      <version>1.14</version>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>2.10.3</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>2.10.3</version>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>jackson2-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.7</version>
+      <version>3.13.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.5.6</version>
+      <version>4.5.14</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
-      <version>4.4.10</version>
+      <version>4.4.16</version>
     </dependency>
     <dependency>
-        <groupId>org.jenkins-ci</groupId>
-        <artifactId>symbol-annotation</artifactId>
-        <version>1.14</version>
+      <groupId>org.jenkins-ci</groupId>
+      <artifactId>symbol-annotation</artifactId>
     </dependency>
 
     <!-- for testing -->
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-job</artifactId>
-      <version>2.12.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-basic-steps</artifactId>
-      <version>2.6</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-step-api</artifactId>
-      <version>2.14</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-support</artifactId>
-      <version>2.18</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-durable-task-step</artifactId>
-      <version>2.19</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-scm-step</artifactId>
-      <version>2.6</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-cps</artifactId>
-      <version>2.54</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>scm-api</artifactId>
-      <version>2.2.6</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-api</artifactId>
-      <version>2.27</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>credentials</artifactId>
-      <version>2.1.18</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>plain-credentials</artifactId>
-      <version>1.4</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>credentials-binding</artifactId>
-      <version>1.15</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>structs</artifactId>
-      <version>1.14</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>script-security</artifactId>
-      <version>1.54</version>
-    </dependency>
-    <dependency>
-      <artifactId>test-harness</artifactId>
-      <groupId>io.jenkins.configuration-as-code</groupId>
-      <version>1.35</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -210,8 +183,32 @@
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock-standalone</artifactId>
-      <version>2.19.0</version>
+      <version>3.0.1</version>
       <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>io.jenkins.configuration-as-code</groupId>
+          <artifactId>test-harness</artifactId>
+          <scope>test</scope>
+          <!-- Pulls in a lot. Triggering all the upperBound errors when Jenkins BOM used -->
+          <exclusions>
+              <exclusion>
+                  <groupId>org.jenkins-ci.main</groupId>
+                  <artifactId>jenkins-test-harness</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.junit.jupiter</groupId>
+                  <artifactId>junit-jupiter-api</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.junit.platform</groupId>
+                  <artifactId>junit-platform-commons</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.json</groupId>
+                  <artifactId>json</artifactId>
+              </exclusion>
+          </exclusions>
+      </dependency>
   </dependencies>
 </project>
