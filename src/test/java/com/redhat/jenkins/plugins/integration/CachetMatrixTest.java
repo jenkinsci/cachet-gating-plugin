@@ -45,6 +45,7 @@ import java.util.Set;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.removeStub;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.Assert.assertEquals;
@@ -140,6 +141,7 @@ public class CachetMatrixTest {
     @Test
     public void testRunningMatrix() throws Exception {
         MatrixProject p = createMatrixProject();
+        removeStub(mockID);
         stubFor(brewOutage);
         ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
 
@@ -148,6 +150,7 @@ public class CachetMatrixTest {
 
         Thread.sleep(10000);
 
+        removeStub(mockID);
         stubFor(normal);
         ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
 

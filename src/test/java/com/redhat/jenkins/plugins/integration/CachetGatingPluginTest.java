@@ -25,6 +25,7 @@ package com.redhat.jenkins.plugins.integration;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.removeStub;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.Assert.assertEquals;
@@ -51,7 +52,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -213,6 +213,7 @@ public class CachetGatingPluginTest {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildGating");
         p.addProperty(new CachetJobProperty(true, Collections.singletonList("brew")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple.groovy"), false));
+        removeStub(mockID);
         stubFor(brewOutage);
         SourceTemplate sourceTemplate = new SourceTemplate(TEST_CACHE_URL, "", false);
         ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
@@ -222,6 +223,7 @@ public class CachetGatingPluginTest {
 
         Thread.sleep(10000);
 
+        removeStub(mockID);
         stubFor(normal);
         ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
 
@@ -244,6 +246,7 @@ public class CachetGatingPluginTest {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildGatingStep");
         p.addProperty(new CachetJobProperty(true, Collections.singletonList("brew")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple-with-step.groovy"), true));
+        removeStub(mockID);
         stubFor(brewOutage);
         SourceTemplate sourceTemplate = new SourceTemplate(TEST_CACHE_URL, "", false);
         ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
@@ -253,6 +256,7 @@ public class CachetGatingPluginTest {
 
         Thread.sleep(10000);
 
+        removeStub(mockID);
         stubFor(normal);
         ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
 
@@ -276,6 +280,7 @@ public class CachetGatingPluginTest {
         WorkflowJob p = j.createProject(WorkflowJob.class, "triggerBuildGatingOperationalStep");
         p.addProperty(new CachetJobProperty(true, Collections.singletonList("errata")));
         p.setDefinition(new CpsFlowDefinition(loadPipelineScript("simple-with-step.groovy"), true));
+        removeStub(mockID);
         stubFor(normal);
         SourceTemplate sourceTemplate = new SourceTemplate(TEST_CACHE_URL, "", false);
         ResourceProvider.SINGLETON.setResourcesForTests(ResourceUpdater.getResources(sourceTemplate));
