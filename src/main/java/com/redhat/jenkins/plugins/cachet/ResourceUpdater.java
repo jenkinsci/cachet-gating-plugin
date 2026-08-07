@@ -35,6 +35,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
 
 import javax.net.ssl.SSLContext;
+import hudson.Util;
 
 @Extension
 public class ResourceUpdater extends PeriodicWork {
@@ -63,7 +64,7 @@ public class ResourceUpdater extends PeriodicWork {
         String cachetUrl = gcc.getCachetUrl();
         Map<String, JsonNode> rmap = new TreeMap<>();
 
-        if (!StringUtils.isEmpty(cachetUrl)){
+        if (Util.fixEmpty(cachetUrl) != null){
             rmap.putAll(getResources(new SourceTemplate(cachetUrl, gcc.getLabel(), gcc.isIgnoreSSL())));
         }
         if (!sources.isEmpty()) {
@@ -115,11 +116,11 @@ public class ResourceUpdater extends PeriodicWork {
 
     public static Map<String, JsonNode> getResources(SourceTemplate sourceTemplate) {
         String api = sourceTemplate.getCachetUrl();
-        boolean ignoreSSL = BooleanUtils.isTrue(sourceTemplate.isIgnoreSSL());
+        boolean ignoreSSL = Boolean.TRUE.equals(sourceTemplate.isIgnoreSSL());
         log.fine(() -> "Refreshing resources from " + api);
 
         Map<String, JsonNode> rmap = null;
-        if (!StringUtils.isEmpty(api)) {
+        if (Util.fixEmpty(api) != null) {
             try (CloseableHttpClient httpClient = createHTTPClient(ignoreSSL)) {
                 rmap = new TreeMap<>();
                 String link = StringUtils.appendIfMissing(api, "/") + LIST_COMPONENTS + "?" + PER_PAGE;
@@ -134,7 +135,7 @@ public class ResourceUpdater extends PeriodicWork {
                                 if (resources != null && resources.size() > 0) {
                                     for (JsonNode n : resources) {
                                         String label = sourceTemplate.getLabel();
-                                        if (!StringUtils.isEmpty(label)) {
+                                        if (Util.fixEmpty(label) != null) {
                                             rmap.put(label + ": " + n.get(ATTRIBUTE_NAME).asText(), n);
                                         } else {
                                             rmap.put(n.get(ATTRIBUTE_NAME).asText(), n);
