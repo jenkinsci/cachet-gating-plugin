@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang.StringUtils;
 
 @Extension
 public class CachetQueueTaskDispatcher extends QueueTaskDispatcher {
@@ -82,7 +81,7 @@ public class CachetQueueTaskDispatcher extends QueueTaskDispatcher {
                     gatingAction.setGatingMetricsMap(metricsMap);
                     item.addOrReplaceAction(gatingAction);
                     if (msgs.size() > 0) {
-                        return CauseOfBlockage.fromMessage(Messages._blockedMessage(StringUtils.join(msgs, "; ")));
+                        return CauseOfBlockage.fromMessage(Messages._blockedMessage(String.join("; ", msgs)));
                     }
                 }
             }

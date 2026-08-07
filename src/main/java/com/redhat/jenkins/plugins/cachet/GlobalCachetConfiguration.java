@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import hudson.Util;
 
 @Extension
 /* The name of the symbol sucks, but it was exposed to users via the casc plugin automagic behaviour. Ability to use multiple
@@ -126,7 +127,7 @@ public final class GlobalCachetConfiguration extends GlobalConfiguration {
             if (mainUrl.equals(url)) {
                 throw new Failure("Attempt adding duplicate Cachet urls - " + url);
             }
-            if (mainLabel.equals(label) && !StringUtils.isEmpty(label)) {
+            if (mainLabel.equals(label) && Util.fixEmpty(label) != null) {
                 throw new Failure("Attempt adding duplicate labels - " + label);
             }
         }
@@ -139,7 +140,7 @@ public final class GlobalCachetConfiguration extends GlobalConfiguration {
                 if (urls.containsKey(url)) {
                     throw new Failure("Attempt adding duplicate Cachet urls - " + url);
                 }
-                if (labels.containsKey(label) && !StringUtils.isEmpty(label)) {
+                if (labels.containsKey(label) && Util.fixEmpty(label) != null) {
                     throw new Failure("Attempt adding duplicate labels - " + label);
                 }
                 urls.put(url, url);
@@ -159,7 +160,7 @@ public final class GlobalCachetConfiguration extends GlobalConfiguration {
 
     @Restricted(DoNotUse.class)
     public FormValidation doCheckCachetUrl(@QueryParameter String cachetUrl){
-        if(StringUtils.isEmpty(cachetUrl)){
+        if(Util.fixEmpty(cachetUrl) == null){
             return FormValidation.warning("Please provide a Cachet Url");
         }
         return FormValidation.ok();
